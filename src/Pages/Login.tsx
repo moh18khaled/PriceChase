@@ -20,13 +20,13 @@ const Login = () => {
     setIsVisible(!isVisible);
   };
   return (
-    <div className="lg:h-screen w-full max-w-screen-2xl   gap-3 bg-customBlue lg:flex md:flex">
+    <div className="shadow-md dark:bg-gray-700 dark:text-white lg:h-screen w-full max-w-screen-2xl   gap-3 bg-customBlue lg:flex md:flex">
       <div className="">
         <FontAwesomeIcon icon={faCartShopping} className="w-10 h-10 p-5 text-white" />
       <h1 className="lg:pl-16 lg:pt-8 pl-10 pt-5 text-white text-[40px] font-semibold h-12 text-center">Welcome Back</h1>
       <img src={mymage} alt="" className="lg:mt-16 mt-10 mx-auto " />
       </div>
-      <div className="w-full max-w-[960px]  bg-white rounded-tl-[40px] rounded-tr-[40px] ml-auto lg:rounded-tl-[40px] lg:rounded-bl-[40px] lg:rounded-tr-none md:rounded-tr-none ">
+      <div className="shadow-md  dark:bg-gray-900 dark:text-white w-full max-w-[960px]  bg-white rounded-tl-[40px] rounded-tr-[40px] ml-auto lg:rounded-tl-[40px] lg:rounded-bl-[40px] lg:rounded-tr-none md:rounded-tr-none ">
         <h1 className="pt-10 font-bold lg:text-[40px] text-[30px] text-center mb-4">Sign In</h1>
         <form action="" className="w-4/5 mx-auto space-y-5" onSubmit={handleSubmit(onSubmit)}>
             
