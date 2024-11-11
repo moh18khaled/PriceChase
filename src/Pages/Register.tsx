@@ -47,22 +47,22 @@ const Register = () => {
             
             <div className="flex flex-col   space-y-1 relative">
                 <label htmlFor="email"  className="font-medium">Email :</label>
-                <FontAwesomeIcon icon={faEnvelope} className="absolute left-4 top-10 w-5 h-5" />
+                <FontAwesomeIcon icon={faEnvelope} className="absolute left-4 top-10 w-5 h-5 dark:text-gray-900" />
                 <input type="email" {...register("email")} className="h-12 border-[1px] border-gray-600 rounded-md pl-12 focus:outline-none focus:border-[2px] focus:border-customBlue "/>
                 <p className="block text-red-700 font-semibold text-sm">{errors.email?.message}</p>
             </div>
             <div className=" lg:flex  lg:space-x-3 lg:space-y-0 space-y-3">
             <div className="flex flex-1 flex-col  space-y-1 relative">
             <label htmlFor="first-name" className="font-medium">Password :</label>
-            <FontAwesomeIcon icon={faLock} className="absolute left-4 top-9 w-5 h-5" />
-            <FontAwesomeIcon icon={isVisible?faEyeSlash :faEye} onClick={togglePasswordVisibility} className="absolute right-4 top-9 w-5 h-5" />
+            <FontAwesomeIcon icon={faLock} className="absolute left-4 top-9 w-5 h-5 dark:text-gray-900" />
+            <FontAwesomeIcon icon={isVisible?faEyeSlash :faEye} onClick={togglePasswordVisibility} className="absolute right-4 top-9 w-5 h-5 dark:text-gray-900" />
             <input type={isVisible? "text" : "password"} id="first-name" {...register("password")} className="h-12 pl-12 border-[1px] border-gray-600 rounded-md  focus:outline-none focus:border-[2px] focus:border-customBlue" />
             <p className="block text-red-700 font-semibold text-sm">{errors.password?.message}</p>
             </div>
             <div className="flex flex-1 flex-col  space-y-1 relative">
             <label htmlFor="last-name" className="font-medium">Confirm Password :</label>
-            <FontAwesomeIcon icon={faLock} className="absolute left-4 top-9 w-5 h-5 cursor-pointer" />
-            <FontAwesomeIcon icon={isVisible?faEyeSlash :faEye} onClick={togglePasswordVisibility} className="absolute right-4 top-9 w-5 h-5 cursor-pointer" />
+            <FontAwesomeIcon icon={faLock} className="absolute left-4 top-9 w-5 h-5 cursor-pointer dark:text-gray-900" />
+            <FontAwesomeIcon icon={isVisible?faEyeSlash :faEye} onClick={togglePasswordVisibility} className="absolute right-4 top-9 w-5 h-5 cursor-pointer dark:text-gray-900" />
             <input type={isVisible? "text" : "password"} id="last-name" {...register("confirmPassword")} className="h-12 border-[1px] border-gray-600 rounded-md pl-12 focus:outline-none focus:border-[2px] focus:border-customBlue" />
             <p className="block text-red-700 font-semibold text-sm">{errors.confirmPassword?.message}</p>
             </div>
