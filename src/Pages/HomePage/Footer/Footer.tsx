@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"
 import footerLogo from "../../../assets/images/footer-pattern-mGVwO-y6.jpg"
 import { footerLinks, mainFooterLinks } from "./data"
 const bannerImage = {
@@ -15,8 +16,8 @@ const Footer = () => {
       <div className="container">
         <div className="w-4/5 mx-auto pb-40 grid md:grid-cols-3">
             {/* PriceChase */}
-            <div className="text-3xl font-bold">
-                <h1 className="py-8">Price<span className="text-customBlue">Chase</span></h1>
+            <div className="text-3xl font-bold mt-8">
+                <Link to = "/" className="py-8">Price<span className="text-customBlue">Chase</span></Link>
             </div>
             {/* Footer Links */}
             <div className="grid grid-cols-2 sm:grid-cols-3 col-span-2 md:pl-10 ">
@@ -27,7 +28,7 @@ const Footer = () => {
                         <ul>
                             {footerLinks.map(({title,link},i)=>(
                                 <li key={i} className="py-2 hover:translate-x-1 duration-300 text-gray-200">
-                                    <a className="hover:text-customBlue transition duration-200" href={link}>{title}</a>
+                                    <Link className="hover:text-customBlue transition duration-200" to={link}>{title}</Link>
                                 </li>
                             ))}
                         </ul>

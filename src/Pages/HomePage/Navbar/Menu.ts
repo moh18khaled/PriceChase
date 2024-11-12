@@ -3,7 +3,7 @@ export const upMenu : IUpMenu[] = [
     {
         id:1,
         name : "Categories",
-        link : "/#",
+        link : "/categories",
     },
     {
         id:2,
@@ -17,28 +17,6 @@ export const upMenu : IUpMenu[] = [
     },
 ]
 
-export const downMenu : IDownMenu[] = [
-    {
-        id : 1,  
-        name : "Men",
-        link :"/#",
-    },
-    {
-        id : 2,  
-        name : "Women",
-        link :"/#",
-    },
-    {
-        id : 3,  
-        name : "Boy",
-        link :"/#",
-    },
-    {
-        id : 4,  
-        name : "Girl",
-        link :"/#",
-    }
-]
 
 export const dropDownLinksMen : IDropDownLinks[] = [
     {

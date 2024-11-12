@@ -6,7 +6,7 @@ interface IProps {
 export const footerLinks : IProps[] = [
     {
         title : "Home",
-        link : "/#"
+        link : "/"
     },
     {
         title : "About",
@@ -25,7 +25,7 @@ export const footerLinks : IProps[] = [
 export const mainFooterLinks : IProps[] = [
     {
         title : "Categories",
-        link : "/#"
+        link : "/categories"
     },
     {
         title : "Popular Products",

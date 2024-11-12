@@ -4,7 +4,6 @@ import { IoIosSearch, IoIosLogOut } from "react-icons/io";
 import { HiMenu, HiX } from "react-icons/hi";
 import {  upMenu } from './Menu';
 
-import DownNavbar from './DownNavbar';
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -19,7 +18,7 @@ const Navbar = () => {
         <div className='w-4/5 mx-auto flex items-center justify-between'>
           {/* Logo */}
           <div>
-            <Link to='' className='font-bold text-2xl sm:text-3xl'>Price<span className='text-customBlue'>Chase</span></Link>
+            <Link to='/' className='font-bold text-2xl sm:text-3xl'>Price<span className='text-customBlue'>Chase</span></Link>
           </div>
 
           {/* Desktop Navigation Links */}
@@ -28,7 +27,7 @@ const Navbar = () => {
               {
                 upMenu.map(({link,name},idx)=>(
                   <li key={idx}>
-                    <a className='hover:duration-200 hover:text-customBlue hover:underline' href={link}>{name}</a>
+                    <Link className='hover:duration-200 hover:text-customBlue hover:underline' to={link}>{name}</Link>
                   </li>
                 ))
               }
@@ -102,7 +101,7 @@ const Navbar = () => {
           </div>
         </div>
       )}
-      <DownNavbar />
+      
     </div>
   );
 };

@@ -25,7 +25,7 @@ const Hero = () => {
        {imageList.map(({id,title,image,description})=>(
         <div key={id} className='container pb-8 sm:pb-0'>
         <div>
-          <div className='w-4/5 mx-auto bg-[#D7E4FF] shadow-xl shadow-gray-400 dark:bg-gray-900/80 dark:text-white px-6 rounded-md mt-60 grid grid-cols-1 sm:grid-cols-2'>
+          <div className='w-4/5 mx-auto bg-[#D7E4FF] shadow-xl  dark:bg-gray-700 dark:text-white px-6 rounded-md mt-60 grid grid-cols-1 sm:grid-cols-2'>
             {/* Text content section */}
             <div className='flex flex-col justify-center gap-4 pt-12 sm:pt-0 text-center sm:text-left order-2 sm:order-1 relative'>
             <h1 className='text-5xl sm:text-6xl lg:text-7xl font-bold'>{title}</h1>
