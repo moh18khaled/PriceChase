@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom"
 import DiscountSlider from "./DiscountSlider"
 
 const DicountSection = () => {
@@ -9,7 +10,9 @@ const DicountSection = () => {
             <h1 data-aos="fade-up" className="text-3xl font-bold">Discount Section</h1>
         </div>
         {/* body section  */}
+        <NavLink to={"/productPage"}>
         <DiscountSlider />
+        </NavLink>
         
       </div>
     </div>

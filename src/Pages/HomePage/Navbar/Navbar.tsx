@@ -86,15 +86,15 @@ const Navbar = () => {
           <div className='flex flex-col items-end gap-5 mt-5 font-bold'>
             {isLoggedIn ? (
               <>
-                <Link to="login" className='text-lg'>Log In</Link>
-                <Link to="register" className='bg-customBlue text-white p-2 rounded-md text-lg'>Sign Up</Link>
+                <Link to="/login" className='text-lg'>Log In</Link>
+                <Link to="/register" className='bg-customBlue text-white p-2 rounded-md text-lg'>Sign Up</Link>
               </>
             ) : (
               <>
                 <div className='text-lg'>Profile</div>
                 <div className='flex items-center gap-2 bg-red-400 text-white p-2 rounded-md'>
                   <IoIosLogOut className='text-2xl' />
-                  <Link to="register">Log Out</Link>
+                  <Link to="/register">Log Out</Link>
                 </div>
               </>
             )}

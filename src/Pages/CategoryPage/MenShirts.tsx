@@ -1,11 +1,13 @@
 import { FaStar } from "react-icons/fa"
 import { shirtsData } from "./data"
+import { NavLink } from "react-router-dom"
 
 const MenShirts = () => {
   return (
     <div className="w-[90%] mx-auto mt-20 mb-10">
       <div>
         <h1 className="text-3xl sm:text-5xl font-bold mb-10 text-center sm:text-left">Men Shirts</h1>
+        <NavLink to={"/productPage"}>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5
         gap-32 md:gap-5 place-items-center mx-auto
         ">
@@ -37,6 +39,7 @@ const MenShirts = () => {
                 </div>
             ))}
         </div>
+        </NavLink>
       </div>
 
       

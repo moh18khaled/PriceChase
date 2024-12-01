@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom"
 import ProductSlider from "./ProductSlider"
 
 const PopularProducts = () => {
@@ -9,7 +10,9 @@ const PopularProducts = () => {
             <h1 data-aos="fade-up" className="text-3xl font-bold">Popular Products</h1>
         </div>
         {/* body section  */}
+        <NavLink to={"/productPage"}>
         <ProductSlider />
+        </NavLink>
         
       </div>
     </div>
