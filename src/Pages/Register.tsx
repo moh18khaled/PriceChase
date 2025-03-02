@@ -8,12 +8,25 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { registerSchema } from "../validation"
 import { Link } from "react-router-dom"
+import apiBaseUrl from "../config/axiosConfig"
 
 const Register = () => {
   const { register, handleSubmit, formState:{ errors } } = useForm({
     resolver: yupResolver(registerSchema)
   });
-  const onSubmit = (data: any) => console.log(data);
+  const onSubmit = async(data: any) => {
+    console.log(data);
+    // 1-pending
+    // 2-fulfilled
+    // 3-rejected
+
+    try {
+      const response = await apiBaseUrl.post("/user/signup",{data});
+      console.log(response);
+    } catch (error) {
+      console.log(error)
+    }
+  }
    
   // to make the passord visible or not visible
   const [isVisible, setIsVisible] = useState(false);
@@ -35,12 +48,12 @@ const Register = () => {
             <div className=" lg:flex  lg:space-x-3 lg:space-y-0 space-y-3">
             <div className="flex flex-1 flex-col ">
             <label htmlFor="first-name" className="font-medium">First Name :</label>
-            <input type="text" id="first-name" {...register("firstName")} className="h-12 border-[1px] border-gray-600 rounded-md pl-4 focus:outline-none focus:border-[2px] focus:border-customBlue" />
+            <input type="text" id="first-name" {...register("firstName")} className={`h-12 border-[1px] ${errors.firstName ? `border-red-500 focus:border-red-500` : `border-gray-600 focus:border-customBlue`} rounded-md pl-4 focus:outline-none focus:border-[2px]`} />
             <p className="block text-red-700 font-semibold text-sm">{errors.firstName?.message}</p>
             </div>
             <div className="flex flex-1 flex-col  ">
             <label htmlFor="last-name"  className="font-medium">Last Name :</label>
-            <input type="text" id="last-name" {...register("lastName")} className="h-12 border-[1px] border-gray-600 rounded-md pl-4 focus:outline-none focus:border-[2px] focus:border-customBlue" />
+            <input type="text" id="last-name" {...register("lastName")} className={`h-12 border-[1px] ${errors.lastName ? `border-red-500 focus:border-red-500` : `border-gray-600 focus:border-customBlue`} rounded-md pl-4 focus:outline-none focus:border-[2px]`} />
             <p className="block text-red-700 font-semibold text-sm">{errors.lastName?.message}</p>
             </div>
             </div>
@@ -48,22 +61,22 @@ const Register = () => {
             <div className="flex flex-col   space-y-1 relative">
                 <label htmlFor="email"  className="font-medium">Email :</label>
                 <FontAwesomeIcon icon={faEnvelope} className="absolute left-4 top-10 w-5 h-5 dark:text-gray-900" />
-                <input type="email" {...register("email")} className="h-12 border-[1px] border-gray-600 rounded-md pl-12 focus:outline-none focus:border-[2px] focus:border-customBlue "/>
+                <input type="email" id="email" {...register("email")} className={`h-12 border-[1px] ${errors.email ? `border-red-500 focus:border-red-500` : `border-gray-600 focus:border-customBlue`} rounded-md pl-12 focus:outline-none focus:border-[2px]`}/>
                 <p className="block text-red-700 font-semibold text-sm">{errors.email?.message}</p>
             </div>
             <div className=" lg:flex  lg:space-x-3 lg:space-y-0 space-y-3">
             <div className="flex flex-1 flex-col  space-y-1 relative">
-            <label htmlFor="first-name" className="font-medium">Password :</label>
+            <label htmlFor="password" className="font-medium">Password :</label>
             <FontAwesomeIcon icon={faLock} className="absolute left-4 top-9 w-5 h-5 dark:text-gray-900" />
             <FontAwesomeIcon icon={isVisible?faEyeSlash :faEye} onClick={togglePasswordVisibility} className="absolute right-4 top-9 w-5 h-5 dark:text-gray-900" />
-            <input type={isVisible? "text" : "password"} id="first-name" {...register("password")} className="h-12 pl-12 border-[1px] border-gray-600 rounded-md  focus:outline-none focus:border-[2px] focus:border-customBlue" />
+            <input type={isVisible? "text" : "password"} id="password" {...register("password")} className={`h-12 border-[1px] ${errors.password ? `border-red-500 focus:border-red-500` : `border-gray-600 focus:border-customBlue`} rounded-md pl-12 pr-12 focus:outline-none focus:border-[2px]`} />
             <p className="block text-red-700 font-semibold text-sm">{errors.password?.message}</p>
             </div>
             <div className="flex flex-1 flex-col  space-y-1 relative">
-            <label htmlFor="last-name" className="font-medium">Confirm Password :</label>
+            <label htmlFor="confirm-password" className="font-medium">Confirm Password :</label>
             <FontAwesomeIcon icon={faLock} className="absolute left-4 top-9 w-5 h-5 cursor-pointer dark:text-gray-900" />
             <FontAwesomeIcon icon={isVisible?faEyeSlash :faEye} onClick={togglePasswordVisibility} className="absolute right-4 top-9 w-5 h-5 cursor-pointer dark:text-gray-900" />
-            <input type={isVisible? "text" : "password"} id="last-name" {...register("confirmPassword")} className="h-12 border-[1px] border-gray-600 rounded-md pl-12 focus:outline-none focus:border-[2px] focus:border-customBlue" />
+            <input type={isVisible? "text" : "password"} id="confirm-password" {...register("confirmPassword")} className={`h-12 border-[1px] ${errors.confirmPassword ? `border-red-500 focus:border-red-500` : `border-gray-600 focus:border-customBlue`} rounded-md pl-12 pr-12 focus:outline-none focus:border-[2px]`} />
             <p className="block text-red-700 font-semibold text-sm">{errors.confirmPassword?.message}</p>
             </div>
             
