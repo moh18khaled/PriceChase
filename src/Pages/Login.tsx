@@ -3,17 +3,68 @@ import {faCartShopping} from "@fortawesome/free-solid-svg-icons"
 import mymage from "../assets/images/register&login.png"
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons"
 import {faLock,faEye,faEyeSlash } from "@fortawesome/free-solid-svg-icons"
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
-import { registerSchema } from "../validation"
-import { Link } from "react-router-dom"
+import { loginSchema } from "../validation"
+import { Link, useNavigate } from "react-router-dom"
+import apiBaseUrl from "../config/axiosConfig"
+import Cookies from "js-cookie";
+import Swal from "sweetalert2"
+import axios from "axios"
+import { User } from "../context/context"
 const Login = () => {
+  const userNow = useContext(User);
+  console.log(userNow);
+  const navigate = useNavigate();
+
+  const [isLoading,setIsLoading] = useState(false);
   const { register, handleSubmit, formState:{ errors } } = useForm({
-    resolver: yupResolver(registerSchema)
+    resolver: yupResolver(loginSchema)
   });
-  const onSubmit = (data: any) => console.log(data);
-   
+  const onSubmit = async(data: any) => {
+    console.log(data);
+    //  1:Pending
+  setIsLoading(true);
+  try {
+    const response = await apiBaseUrl.post("/user/login",data);
+    console.log(response);
+    const userDetails = response.data.data.user;
+    console.log(userDetails);
+    userNow.setAuth({ userDetails });
+
+    Cookies.set("userEmail",data.email,{expires : 7});
+
+    
+    if(response.status===200){
+      // Redirect to the home page
+      Swal.fire({
+      title: response.data.message,
+      icon: "success",
+      draggable: true,
+      }).then((result)=>{
+      if(result.isConfirmed){
+          navigate("/");
+      }
+      });
+    }
+  } catch (error:unknown) {
+    // 3-rejected
+if(axios.isAxiosError(error)){
+  console.log(error.response);
+  Swal.fire({
+  icon: "error",
+  title: "Failed to Create Account",
+  text: error.response?.data.error,
+  confirmButtonColor: "#6D95EA",
+  });
+}
+} finally{
+      setIsLoading(false);
+  }
+
+}
+  
   // to make the passord visible or not visible
   const [isVisible, setIsVisible] = useState(false);
   const togglePasswordVisibility = () => {
@@ -51,8 +102,39 @@ const Login = () => {
             
            
             <div>
-            <button className="bg-customBlue  w-full rounded-md text-white font-medium mt-5  p-3 ">Login</button>
-            <h3 className="mt-2">Don't have an an account? <Link className="text-customBlue font-medium cursor-pointer" to={"/register"}>Sign up</Link></h3>
+            <button
+                className={`bg-customBlue w-full rounded-md text-white font-medium mt-5 p-3 flex items-center justify-center 
+                ${isLoading ? "opacity-50 cursor-not-allowed" : "opacity-100"}`}
+                disabled={isLoading}
+            >
+                {isLoading ? (
+                    <>
+                        <svg
+                            className="animate-spin h-5 w-5 mr-2 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                        >
+                            <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                            ></circle>
+                            <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v8H4z"
+                            ></path>
+                        </svg>
+                        Loading...
+                    </>
+                ) : (
+                    "Login"
+                )}
+            </button>            <h3 className="mt-2">Don't have an an account? <Link className="text-customBlue font-medium cursor-pointer" to={"/register"}>Sign up</Link></h3>
         </div>
         </form>
         

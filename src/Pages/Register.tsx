@@ -8,23 +8,53 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { registerSchema } from "../validation"
 import { Link } from "react-router-dom"
+import axios from "axios";
 import apiBaseUrl from "../config/axiosConfig"
+import Swal from "sweetalert2"
+import Cookies from "js-cookie";
 
 const Register = () => {
+  const [isLoading,setIsLoading] = useState(false);
   const { register, handleSubmit, formState:{ errors } } = useForm({
     resolver: yupResolver(registerSchema)
   });
   const onSubmit = async(data: any) => {
     console.log(data);
-    // 1-pending
-    // 2-fulfilled
-    // 3-rejected
+        // 1-pending
+    setIsLoading(true);
 
     try {
-      const response = await apiBaseUrl.post("/user/signup",{data});
+          // 2-fulfilled
+      const response = await apiBaseUrl.post("/user/signup",data);
       console.log(response);
-    } catch (error) {
-      console.log(error)
+      if(response.status===201){
+        Swal.fire({
+          title: "Success!",
+            text: response.data.message, // Display the message from the backend
+            icon: "info",
+            confirmButtonText: "OK",
+            confirmButtonColor: "#6D95EA",
+
+        }).then((result) => {
+          if(result.isConfirmed){
+            window.location.href = "/login";
+          }
+        });
+      }
+          Cookies.set("userEmail",data.email,{expires : 7});
+    } catch (error:unknown) {
+          // 3-rejected
+      if(axios.isAxiosError(error)){
+        console.log(error.response);
+        Swal.fire({
+        icon: "error",
+        title: "Failed to Create Account",
+        text: error.response?.data.error,
+        confirmButtonColor: "#6D95EA",
+        });
+      }
+    } finally {
+      setIsLoading(false);
     }
   }
    
@@ -82,7 +112,39 @@ const Register = () => {
             
             </div>
             <div>
-            <button className="bg-customBlue  w-full rounded-md text-white font-medium mt-5  p-3 ">Create Account</button>
+            <button
+                className={`bg-customBlue w-full rounded-md text-white font-medium mt-5 p-3 flex items-center justify-center 
+                ${isLoading ? "opacity-50 cursor-not-allowed" : "opacity-100"}`}
+                disabled={isLoading}
+            >
+                {isLoading ? (
+                    <>
+                        <svg
+                            className="animate-spin h-5 w-5 mr-2 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                        >
+                            <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                            ></circle>
+                            <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v8H4z"
+                            ></path>
+                        </svg>
+                        Loading...
+                    </>
+                ) : (
+                    "Create Account"
+                )}
+            </button>
             <h3 className="mt-2">Already have an an account? <Link className="text-customBlue font-medium cursor-pointer" to={"/login"}>Sign in</Link></h3>
         </div>
         </form>

@@ -1,12 +1,71 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { IoIosSearch, IoIosLogOut } from "react-icons/io";
 import { HiMenu, HiX } from "react-icons/hi";
 import {  upMenu } from './Menu';
+import { User } from '../../../context/context';
+import apiBaseUrl from '../../../config/axiosConfig';
+import Cookies from "js-cookie";
+import Swal from "sweetalert2"
 
 const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const checkUser = useContext(User);
+  console.log(checkUser);
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const userEmail = Cookies.get("userEmail");
+    if (userEmail) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  // handle the logout
+  const handleLogout = async () => {
+    try {
+      const { isConfirmed } = await Swal.fire({
+        title: "Are you sure you want to logout?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, logout!",
+      });
+
+      if (isConfirmed) {
+        const response = await apiBaseUrl.post("/user/logout", {}, { withCredentials: true });
+        console.log(response);
+        if (response.status === 200) {
+          // Clear cookies
+          Cookies.remove("auth");
+          // Cookies.remove("businessOwnerAuth");
+          // Cookies.remove("profilePicture");
+          Cookies.remove("userEmail");
+
+          // Clear context state
+          checkUser.setAuth({});
+          // checkUser.setBusinessOwnerAuth({});
+          // checkUser.setProfilePicture("");
+
+          // Navigate to login page
+          navigate("/login");
+          Swal.fire({
+            title: "Logged Out!",
+            text: response.data.message,
+            icon: "success",
+          });
+        }
+      }
+    } catch (error:any) {
+      Swal.fire({
+        icon: "error",
+        title: "Logout Failed",
+        text: error.response?.data?.error || "An error occurred during logout",
+      });
+    }
+  };
 
   // Toggle menu open/close state
   const toggleMenu = () => setMenuOpen(!menuOpen);
@@ -46,7 +105,7 @@ const Navbar = () => {
 
           {/* Desktop Auth Links */}
           <div className='lg:block hidden font-bold space-x-3'>
-            {isLoggedIn ? (
+            {!isLoggedIn ? (
               <>
                 <Link to="login">Log In</Link>
                 <Link to="register" className='bg-customBlue text-white p-2 rounded-md'>Sign Up</Link>
@@ -54,9 +113,9 @@ const Navbar = () => {
             ) : (
               <div className='lg:flex hidden items-center gap-3'>
                 <div>Profile</div>
-                <div className='flex items-center gap-2 bg-red-400 text-white p-2 rounded-md'>
+                <div onClick={handleLogout} className='flex items-center gap-2 bg-red-400 text-white p-2 rounded-md'>
                   <IoIosLogOut className='text-2xl' />
-                  <Link to="register">Log Out</Link>
+                  <button>Log Out</button>
                 </div>
               </div>
             )}
@@ -84,7 +143,7 @@ const Navbar = () => {
               }
           </ul>
           <div className='flex flex-col items-end gap-5 mt-5 font-bold'>
-            {isLoggedIn ? (
+            {!isLoggedIn ? (
               <>
                 <Link to="/login" className='text-lg'>Log In</Link>
                 <Link to="/register" className='bg-customBlue text-white p-2 rounded-md text-lg'>Sign Up</Link>
@@ -92,9 +151,9 @@ const Navbar = () => {
             ) : (
               <>
                 <div className='text-lg'>Profile</div>
-                <div className='flex items-center gap-2 bg-red-400 text-white p-2 rounded-md'>
+                <div onClick={handleLogout} className='flex items-center gap-2 bg-red-400 text-white p-2 rounded-md'>
                   <IoIosLogOut className='text-2xl' />
-                  <Link to="/register">Log Out</Link>
+                  <button>Log Out</button>
                 </div>
               </>
             )}

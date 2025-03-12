@@ -4,10 +4,12 @@ import Register from "./Pages/Register";
 import HomePage from "./Pages/HomePage";
 import CategoryPage from "./Pages/CategoryPage/CategoryPage";
 import ProductPage from "./Pages/ProductPage/ProductPage";
+import { UserProvider } from "./context/context";
 
 const App = ()=>{
   return (
-    <>
+    
+    <UserProvider>
     <Routes>
       <Route path="" element = {<HomePage />} />
       <Route path="register" element = {<Register />} />
@@ -15,7 +17,8 @@ const App = ()=>{
       <Route path="categories" element = { <CategoryPage />} />
       <Route path="productPage" element = {<ProductPage />} />
     </Routes>
-    </>
+    </UserProvider>
+    
   )
 }
 export default App;
