@@ -4,7 +4,22 @@ import image23 from "../../assets/images/image 23.png"
 import { FaStar } from "react-icons/fa"
 import { FaRegStar } from "react-icons/fa6"
 import { MdOutlineFavoriteBorder } from "react-icons/md"
+import { useEffect, useState } from "react"
+import { fetchPopularProducts } from "../HomePage/PopularProducts/data"
+import { useParams } from "react-router-dom"
+import apiBaseUrl from "../../config/axiosConfig"
 const ProductDetails = () => {
+  const { id } = useParams();
+
+  const [popularProduct, setPopularProduct] = useState(null);
+
+  useEffect(() => {
+    const fetchSingleProduct =async ()=>{
+      const response = await apiBaseUrl.get(`/products/popular/${id}`);
+      console.log(response);
+    }
+    fetchSingleProduct();
+  }, []);
   return (
     <div className="w-[95%] mx-auto mt-4">
       <div className="lg:flex lg:space-x-8 space-y-6">

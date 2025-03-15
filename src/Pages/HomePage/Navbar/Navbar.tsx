@@ -107,12 +107,16 @@ const Navbar = () => {
           <div className='lg:block hidden font-bold space-x-3'>
             {!isLoggedIn ? (
               <>
-                <Link to="login">Log In</Link>
-                <Link to="register" className='bg-customBlue text-white p-2 rounded-md'>Sign Up</Link>
+                <Link to="/login">Log In</Link>
+                <Link to="/register" className='bg-customBlue text-white p-2 rounded-md'>Sign Up</Link>
               </>
             ) : (
               <div className='lg:flex hidden items-center gap-3'>
-                <div>Profile</div>
+                <div>
+                  <Link to="/profile-page">
+                  <button>Profile</button>
+                  </Link>
+                </div>
                 <div onClick={handleLogout} className='flex items-center gap-2 bg-red-400 text-white p-2 rounded-md'>
                   <IoIosLogOut className='text-2xl' />
                   <button>Log Out</button>
@@ -150,8 +154,11 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <div className='text-lg'>Profile</div>
-                <div onClick={handleLogout} className='flex items-center gap-2 bg-red-400 text-white p-2 rounded-md'>
+                <div className='text-lg'>
+                  <Link to="/profile-page">
+                  <button>Profile</button>
+                  </Link>
+                </div>                <div onClick={handleLogout} className='flex items-center gap-2 bg-red-400 text-white p-2 rounded-md'>
                   <IoIosLogOut className='text-2xl' />
                   <button>Log Out</button>
                 </div>

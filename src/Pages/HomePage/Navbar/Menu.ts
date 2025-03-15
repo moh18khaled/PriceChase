@@ -1,4 +1,5 @@
-import { IDownMenu, IDropDownLinks, IUpMenu } from "./interfaces";
+import apiBaseUrl from "../../../config/axiosConfig";
+import { IUpMenu } from "./interfaces";
 export const upMenu : IUpMenu[] = [
     {
         id:1,
@@ -17,115 +18,12 @@ export const upMenu : IUpMenu[] = [
     },
 ]
 
-
-export const dropDownLinksMen : IDropDownLinks[] = [
-    {
-        id : 1,
-        name : "Shirts",
-        link : "/#",
-    },
-    {
-        id : 2,
-        name : "Shorts",
-        link : "/#",
-    },
-    {
-        id : 3,
-        name : "Jeans",
-        link : "/#",
-    },
-    {
-        id : 4,
-        name : "Pants",
-        link : "/#",
-    },
-    {
-        id : 5,
-        name : "Activewear",
-        link : "/#",
-    },
-    {
-        id : 6,
-        name : "Jackets",
-        link : "/#",
-    },
-]
-
-export const dropDownLinksWomen : IDropDownLinks[] = [
-    {
-        id : 1,
-        name : "Shorts",
-        link : "/#",
-    },
-    {
-        id : 2,
-        name : "Jeans",
-        link : "/#",
-    },
-    {
-        id : 3,
-        name : "Activewear",
-        link : "/#",
-    },
-    {
-        id : 4,
-        name : "Dresses",
-        link : "/#",
-    },
-]
-
-export const dropDownLinksBoy : IDropDownLinks[] = [   
-        {
-            id : 1,
-            name : "T-Shirts",
-            link : "/#",
-        },
-        {
-            id : 2,
-            name : "Shorts",
-            link : "/#",
-        },
-        {
-            id : 3,
-            name : "Jeans",
-            link : "/#",
-        },
-        {
-            id : 4,
-            name : "Activewear",
-            link : "/#",
-        },
-        {
-            id : 5,
-            name : "Jackets",
-            link : "/#",
-        },
-]
-
-export const dropDownLinksGirl : IDropDownLinks[] = [   
-    {
-        id : 1,
-        name : "T-Shirts",
-        link : "/#",
-    },
-    {
-        id : 2,
-        name : "Shorts",
-        link : "/#",
-    },
-    {
-        id : 3,
-        name : "Jeans",
-        link : "/#",
-    },
-    {
-        id : 4,
-        name : "Activewear",
-        link : "/#",
-    },
-    {
-        id : 5,
-        name : "Dresses",
-        link : "/#",
-    },
-]
+export const fetchCategories = async ()=>{
+    try {
+        const response = await apiBaseUrl.get("/categories/");
+        console.log(response.data.Categories);
+        return response.data.Categories;
+    } catch (error) {
+        console.log(error);
+    }
+}
