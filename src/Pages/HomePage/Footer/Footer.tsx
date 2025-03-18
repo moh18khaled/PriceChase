@@ -1,18 +1,9 @@
 import { Link } from "react-router-dom"
-import footerLogo from "../../../assets/images/footer-pattern-mGVwO-y6.jpg"
 import { footerLinks, mainFooterLinks } from "./data"
-const bannerImage = {
-    backgroundImage : `url(${footerLogo})`,
-    backgroundPosition : "bottom",
-    backgroundRepeat : "no-repeat",
-    backgroundSize : "cover",
-    height : "100%",
-    width : "100",
 
-}
 const Footer = () => {
   return (
-    <div className="text-white" style={bannerImage}>
+    <div className="bg-gradient-to-b from-gray-800 to-gray-900 text-white">
       <div className="container">
         <div className="w-4/5 mx-auto pb-40 grid md:grid-cols-3">
             {/* PriceChase */}
@@ -20,7 +11,7 @@ const Footer = () => {
                 <Link to = "/" className="py-8">Price<span className="text-customBlue">Chase</span></Link>
             </div>
             {/* Footer Links */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 col-span-2 md:pl-10 ">
+            <div className="grid grid-cols-2 sm:grid-cols-3 col-span-2 md:pl-10">
                 {/* Important Links */}
                 <div>
                     <div className="py-8 px-4">
