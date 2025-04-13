@@ -27,7 +27,7 @@ const Login = () => {
     //  1:Pending
   setIsLoading(true);
   try {
-    const response = await apiBaseUrl.post("/user/login",data);
+    const response = await apiBaseUrl.post("/user/login",data,{withCredentials : true});
     console.log(response);
     const userDetails = response.data.data.user;
     console.log(userDetails);

@@ -2,7 +2,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { FaStar } from 'react-icons/fa';
+import { FaStar, FaSpinner } from 'react-icons/fa'; // Added FaSpinner
 import { fetchPopularProducts } from './data';
 import { Pagination, Navigation } from 'swiper/modules';
 import { useEffect, useState } from 'react';
@@ -11,11 +11,19 @@ import { useNavigate } from 'react-router-dom';
 const ProductSlider = () => {
   const navigate = useNavigate();
   const [popularProducts, setPopularProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Added loading state
 
   useEffect(() => {
     const getPopularProducts = async () => {
-      const data = await fetchPopularProducts();
-      setPopularProducts(data);
+      setIsLoading(true); // Set loading to true when fetch starts
+      try {
+        const data = await fetchPopularProducts();
+        setPopularProducts(data);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setIsLoading(false); // Set loading to false when fetch completes
+      }
     };
     getPopularProducts();
   }, []);
@@ -23,6 +31,15 @@ const ProductSlider = () => {
   const handleProductClick = (id: string) => {
     navigate(`/productPage/${id}`);
   };
+
+  // Show spinner while loading
+  if (isLoading) {
+    return (
+      <div className="w-full flex justify-center items-center py-20">
+        <FaSpinner className="animate-spin text-4xl text-customBlue" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8">

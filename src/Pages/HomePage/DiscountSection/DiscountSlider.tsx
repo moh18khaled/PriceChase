@@ -2,7 +2,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { FaStar } from 'react-icons/fa';
+import { FaStar, FaSpinner } from 'react-icons/fa'; // Added FaSpinner
 import { MdLocalOffer } from 'react-icons/md';
 import { Pagination, Navigation } from 'swiper/modules';
 import { useEffect, useState } from 'react';
@@ -12,11 +12,19 @@ import { useNavigate } from 'react-router-dom';
 const DiscountSlider = () => {
   const navigate = useNavigate();
   const [discountProducts, setDiscountProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Added loading state
 
   useEffect(() => {
     const getDiscountProducts = async () => {
-      const data = await fetchDiscountProducts();
-      setDiscountProducts(data);
+      setIsLoading(true); // Set loading to true when fetch starts
+      try {
+        const data = await fetchDiscountProducts();
+        setDiscountProducts(data);
+      } catch (error) {
+        console.error('Error fetching discount products:', error);
+      } finally {
+        setIsLoading(false); // Set loading to false when fetch completes
+      }
     };
     getDiscountProducts();
   }, []);
@@ -24,6 +32,15 @@ const DiscountSlider = () => {
   const handleProductClick = (id: string) => {
     navigate(`/productPage/${id}`);
   };
+
+  // Show spinner while loading
+  if (isLoading) {
+    return (
+      <div className="w-full flex justify-center items-center py-20">
+        <FaSpinner className="animate-spin text-4xl text-customBlue" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
@@ -88,9 +105,6 @@ const DiscountSlider = () => {
                       />
                     ))}
                   </div>
-                  <span className="text-gray-600 dark:text-gray-400 text-sm">
-                    (100 Reviews)
-                  </span>
                 </div>
 
                 {/* Price and CTA */}

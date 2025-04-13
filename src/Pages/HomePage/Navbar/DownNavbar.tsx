@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchCategories } from './Menu';
 import apiBaseUrl from '../../../config/axiosConfig';
+import { Link } from 'react-router-dom';
 
 interface SubCategory {
     _id: string;
@@ -103,15 +104,15 @@ const DownNavbar = () => {
                                     <div className="mt-2 pl-4 space-y-2 bg-gradient-to-b from-gray-50 to-gray-100 
                                                    dark:from-gray-700 dark:to-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600">
                                         {categorySubcategories[_id].map(({ _id: subId, SubCategoryName }) => (
-                                            <a
+                                            <Link
                                                 key={subId}
-                                                href="#"
+                                                to = {`/categories/${_id}`}
                                                 className="block px-4 py-2 text-sm text-gray-600 dark:text-white hover:text-customBlue 
                                                          hover:bg-white dark:hover:bg-gray-600 
                                                          transition duration-200 rounded"
                                             >
                                                 {SubCategoryName}
-                                            </a>
+                                            </Link>
                                         ))}
                                     </div>
                                 )}
