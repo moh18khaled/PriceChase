@@ -30,7 +30,7 @@ const ProfileDetails = () => {
 
   return (
     <div className="dark:bg-gray-600 dark:text-white">
-      <div className="py-12 px-5 lg:py-24 lg:px-24">
+      <div className="py-12 px-5 lg:py-18 lg:px-24">
         <div className="flex flex-col items-center space-y-6 lg:flex-row lg:items-center lg:space-x-20 lg:space-y-0">
           <div className="w-28 h-28 sm:w-40 sm:h-40 md:w-52 md:h-52 rounded-full">
             <img className="w-full h-full rounded-full" src={userAccountData.profilePicture} alt="" />

@@ -4,13 +4,13 @@ import { IoIosSearch, IoIosLogOut } from "react-icons/io";
 import { HiMenu, HiX } from "react-icons/hi";
 import { BsSun, BsMoon } from "react-icons/bs";
 import { upMenu } from './Menu';
-import { User } from '../../../context/context';
+import { UserContext } from '../../../context/context';
 import apiBaseUrl from '../../../config/axiosConfig';
 import Cookies from "js-cookie";
 import Swal from "sweetalert2"
 
 const Navbar = () => {
-  const checkUser = useContext(User);
+  const user = useContext(UserContext);
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -34,7 +34,15 @@ const Navbar = () => {
     document.documentElement.classList.toggle('dark');
   };
 
-  // handle the logout
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const hasAuth = user?.auth || user?.adminAuth;
+      setIsLoggedIn(!!hasAuth);
+    };
+
+    checkLoginStatus();
+  }, [user?.auth, user?.adminAuth]);
+
   const handleLogout = async () => {
     try {
       const { isConfirmed } = await Swal.fire({
@@ -47,27 +55,42 @@ const Navbar = () => {
       });
 
       if (isConfirmed) {
-        const response = await apiBaseUrl.post("/user/logout", {}, { withCredentials: true });
+        const response = await apiBaseUrl.post(
+          `/user/logout`,
+          {},
+          { withCredentials: true }
+        );
         if (response.status === 200) {
           Cookies.remove("auth");
+          Cookies.remove("adminAuth");
+          Cookies.remove("profilePicture");
           Cookies.remove("userEmail");
-          checkUser.setAuth({});
+
+          user?.setAuth(null);
+          user?.setAdminAuth(null);
+          user?.setProfilePicture("");
+
+          setIsLoggedIn(false);
+
           navigate("/login");
           Swal.fire({
             title: "Logged Out!",
-            text: response.data.message,
+            text: "You have been successfully logged out.",
             icon: "success",
           });
         }
       }
-    } catch (error:any) {
+    } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Logout Failed",
-        text: error.response?.data?.error || "An error occurred during logout",
+        text: "An error occurred during logout",
       });
     }
   };
+
+  const currentUser = user?.auth || user?.adminAuth;
+  const profilePicture = user?.profilePicture || currentUser?.profilePicture?.url;
 
   // Toggle menu and prevent scroll when menu is open
   const toggleMenu = () => {
@@ -75,19 +98,13 @@ const Navbar = () => {
     document.body.style.overflow = !menuOpen ? 'hidden' : 'unset';
   };
 
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const menu = document.getElementById('mobile-menu');
-      if (menuOpen && menu && !menu.contains(event.target as Node)) {
-        setMenuOpen(false);
-        document.body.style.overflow = 'unset';
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [menuOpen]);
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    setMenuOpen(false); // Close mobile menu if open
+  };
 
   return (
     <nav className='sticky top-0 z-50 bg-white dark:bg-gray-900 dark:text-white'>
@@ -106,12 +123,35 @@ const Navbar = () => {
             <ul className='flex items-center gap-8'>
               {upMenu.map(({link, name}, idx) => (
                 <li key={idx}>
-                  <Link 
-                    className='hover:text-customBlue transition-colors duration-200 font-semibold' 
-                    to={link}
-                  >
-                    {name}
-                  </Link>
+                  {name === 'Popular Products' ? (
+                    <button 
+                      onClick={() => scrollToSection('popular-products')}
+                      className='hover:text-customBlue transition-colors duration-200 font-semibold'
+                    >
+                      {name}
+                    </button>
+                  ) : name === 'Discount Section' ? (
+                    <button
+                      onClick={() => scrollToSection('discount-products')}
+                      className='text-lg font-semibold hover:text-customBlue transition-colors duration-200'
+                    >
+                      {name}
+                    </button>
+                  ) : name === 'Categories' ? (
+                    <button
+                      onClick={() => scrollToSection('categories')}
+                      className='text-lg font-semibold hover:text-customBlue transition-colors duration-200'
+                    >
+                      {name}
+                    </button>
+                  ) : (
+                    <Link 
+                      className='hover:text-customBlue transition-colors duration-200 font-semibold' 
+                      to={link}
+                    >
+                      {name}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -143,30 +183,35 @@ const Navbar = () => {
             </button>
 
             {/* Desktop Auth Links */}
-            <div className='hidden lg:flex items-center gap-4'>
-              {!isLoggedIn ? (
-                <>
-                  <Link 
-                    to="/login" 
-                    className='font-semibold hover:text-customBlue transition-colors duration-200'
+            {isLoggedIn ? 
+              <div className='hidden lg:flex items-center gap-4'>
+                {user?.adminAuth?.email &&
+                  <button
+                    onClick={() => navigate("/admin")}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
                   >
-                    Log In
-                  </Link>
-                  <Link 
-                    to="/register" 
-                    className='bg-customBlue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-200'
-                  >
-                    Sign Up
-                  </Link>
-                </>
-              ) : (
+                    Dashboard
+                  </button>
+                }
+
                 <div className='flex items-center gap-4'>
-                  <Link 
-                    to="/profile-page"
-                    className='font-semibold hover:text-customBlue transition-colors duration-200'
-                  >
-                    Profile
-                  </Link>
+                  {profilePicture ? (
+                    <img 
+                      src={profilePicture} 
+                      alt="Profile" 
+                      className="w-10 h-10 rounded-full object-cover cursor-pointer"
+                      onClick={() => navigate("/profile-page")}
+                    />
+                  ) : (
+                    <div 
+                      className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center cursor-pointer"
+                      onClick={() => navigate("/profile-page")}
+                    >
+                      <span className="text-gray-700 dark:text-gray-300">
+                        {currentUser?.firstName?.charAt(0).toUpperCase() || 'U'}
+                      </span>
+                    </div>
+                  )}
                   <button
                     onClick={handleLogout}
                     className='flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200'
@@ -175,8 +220,23 @@ const Navbar = () => {
                     Log Out
                   </button>
                 </div>
-              )}
-            </div>
+              </div>
+            : 
+              <div className='hidden lg:flex items-center gap-4'>
+                <Link 
+                  to="/login" 
+                  className='font-semibold hover:text-customBlue transition-colors duration-200'
+                >
+                  Log In
+                </Link>
+                <Link 
+                  to="/register" 
+                  className='bg-customBlue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-200'
+                >
+                  Sign Up
+                </Link>
+              </div>
+            }
 
             {/* Mobile Menu Toggle */}
             <button 
@@ -193,78 +253,149 @@ const Navbar = () => {
       {menuOpen && (
         <div 
           id="mobile-menu"
-          className='fixed inset-y-0 right-0 w-[280px] bg-white dark:bg-gray-900 shadow-xl 
-                     transform transition-transform duration-300 ease-in-out lg:hidden
-                     flex flex-col'
+          className='fixed inset-0 z-50 bg-black bg-opacity-50 lg:hidden'
+          onClick={() => {
+            setMenuOpen(false);
+            document.body.style.overflow = 'unset';
+          }}
         >
-          <div className='p-6 flex flex-col h-full'>
-            {/* Mobile Search */}
-            <div className='relative mb-6 sm:hidden'>
-              <input
-                type="text"
-                placeholder='Search'
-                className='w-full transition-all duration-300 rounded-lg border 
-                         border-gray-300 px-4 py-2 focus:outline-none focus:border-customBlue
-                         dark:bg-gray-800 dark:border-gray-700'
-              />
-              <IoIosSearch className='text-gray-500 text-xl absolute top-1/2 -translate-y-1/2 right-3' />
-            </div>
+          <div 
+            className='absolute right-0 top-0 h-full w-[280px] bg-white dark:bg-gray-900 shadow-xl transform transition-transform duration-300 ease-in-out flex flex-col'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className='p-6 flex flex-col h-full'>
+              {/* Close button */}
+              <button 
+                onClick={() => {
+                  setMenuOpen(false);
+                  document.body.style.overflow = 'unset';
+                }}
+                className='self-end mb-4 text-2xl hover:text-customBlue transition-colors duration-200'
+              >
+                <HiX />
+              </button>
 
-            {/* Mobile Navigation Links */}
-            <ul className='flex flex-col gap-4 mb-6'>
-              {upMenu.map(({link, name}, idx) => (
-                <li key={idx}>
-                  <Link 
-                    to={link}
-                    className='text-lg font-semibold hover:text-customBlue transition-colors duration-200'
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+              {/* Mobile Search */}
+              <div className='relative mb-6 sm:hidden'>
+                <input
+                  type="text"
+                  placeholder='Search'
+                  className='w-full transition-all duration-300 rounded-lg border 
+                           border-gray-300 px-4 py-2 focus:outline-none focus:border-customBlue
+                           dark:bg-gray-800 dark:border-gray-700'
+                />
+                <IoIosSearch className='text-gray-500 text-xl absolute top-1/2 -translate-y-1/2 right-3' />
+              </div>
 
-            {/* Mobile Auth Links */}
-            <div className='mt-auto'>
-              {!isLoggedIn ? (
-                <div className='flex flex-col gap-4'>
-                  <Link 
-                    to="/login" 
-                    className='text-center font-semibold hover:text-customBlue transition-colors duration-200'
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Log In
-                  </Link>
-                  <Link 
-                    to="/register" 
-                    className='text-center bg-customBlue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-200'
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              ) : (
-                <div className='flex flex-col gap-4'>
-                  <Link 
-                    to="/profile-page"
-                    className='text-center font-semibold hover:text-customBlue transition-colors duration-200'
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Profile
-                  </Link>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setMenuOpen(false);
-                    }}
-                    className='flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200'
-                  >
-                    <IoIosLogOut className='text-xl' />
-                    Log Out
-                  </button>
-                </div>
-              )}
+              {/* Mobile Navigation Links */}
+              <ul className='flex flex-col gap-4 mb-6'>
+                {upMenu.map(({link, name}, idx) => (
+                  <li key={idx}>
+                    {name === 'Popular Products' ? (
+                      <button
+                        onClick={() => scrollToSection('popular-products')}
+                        className='text-lg font-semibold hover:text-customBlue transition-colors duration-200 w-full text-left'
+                      >
+                        {name}
+                      </button>
+                    ) : name === 'Discount Section' ? (
+                      <button
+                        onClick={() => scrollToSection('discount-products')}
+                        className='text-lg font-semibold hover:text-customBlue transition-colors duration-200 w-full text-left'
+                      >
+                        {name}
+                      </button>
+                    ) : name === 'Categories' ? (
+                      <button
+                        onClick={() => scrollToSection('categories')}
+                        className='text-lg font-semibold hover:text-customBlue transition-colors duration-200 w-full text-left'
+                      >
+                        {name}
+                      </button>
+                    ) : (
+                      <Link 
+                        to={link}
+                        className='text-lg font-semibold hover:text-customBlue transition-colors duration-200 block'
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        {name}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Mobile Auth Links */}
+              <div className='mt-auto'>
+                {isLoggedIn ? (
+                  <div className='flex flex-col gap-4'>
+                    {user?.adminAuth?.email && (
+                      <button
+                        onClick={() => {
+                          navigate("/admin");
+                          setMenuOpen(false);
+                        }}
+                        className="w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                      >
+                        Dashboard
+                      </button>
+                    )}
+                    
+                    <div className='flex items-center gap-4'>
+                      {profilePicture ? (
+                        <img 
+                          src={profilePicture} 
+                          alt="Profile" 
+                          className="w-10 h-10 rounded-full object-cover cursor-pointer"
+                          onClick={() => {
+                            navigate("/profile-page");
+                            setMenuOpen(false);
+                          }}
+                        />
+                      ) : (
+                        <div 
+                          className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center cursor-pointer"
+                          onClick={() => {
+                            navigate("/profile-page");
+                            setMenuOpen(false);
+                          }}
+                        >
+                          <span className="text-gray-700 dark:text-gray-300">
+                            {currentUser?.firstName?.charAt(0).toUpperCase() || 'U'}
+                          </span>
+                        </div>
+                      )}
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setMenuOpen(false);
+                        }}
+                        className='flex-1 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200'
+                      >
+                        <IoIosLogOut className='text-xl' />
+                        Log Out
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className='flex flex-col gap-4'>
+                    <Link 
+                      to="/login" 
+                      className='text-center font-semibold hover:text-customBlue transition-colors duration-200'
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      Log In
+                    </Link>
+                    <Link 
+                      to="/register" 
+                      className='bg-customBlue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-200 text-center'
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      Sign Up
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

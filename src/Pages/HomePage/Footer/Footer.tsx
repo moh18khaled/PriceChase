@@ -3,42 +3,60 @@ import { footerLinks, mainFooterLinks } from "./data"
 
 const Footer = () => {
   return (
-    <div className="bg-gradient-to-b from-gray-800 to-gray-900 text-white">
-      <div className="container">
-        <div className="w-4/5 mx-auto pb-40 grid md:grid-cols-3">
-            {/* PriceChase */}
-            <div className="text-3xl font-bold mt-8">
-                <Link to = "/" className="py-8">Price<span className="text-customBlue">Chase</span></Link>
+    <div className="bg-gradient-to-b from-gray-800 to-gray-900 text-white py-8">
+      <div className="container mx-auto px-4">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8">
+          {/* PriceChase Logo - Made more compact */}
+          <div className="md:col-span-1">
+            <Link to="/" className="text-2xl font-bold hover:text-customBlue transition duration-200">
+              Price<span className="text-customBlue">Chase</span>
+            </Link>
+            <p className="text-gray-400 text-sm mt-2">
+              Your trusted price comparison platform
+            </p>
+          </div>
+
+          {/* Footer Links - Made more compact */}
+          <div className="grid grid-cols-2 gap-8 md:col-span-3">
+            {/* Important Links */}
+            <div>
+              <h2 className="text-lg font-semibold mb-3">Important Links</h2>
+              <ul className="space-y-2">
+                {footerLinks.map(({title, link}, i) => (
+                  <li key={i}>
+                    <Link 
+                      to={link}
+                      className="text-gray-300 hover:text-customBlue text-sm transition duration-200"
+                    >
+                      {title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-            {/* Footer Links */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 col-span-2 md:pl-10">
-                {/* Important Links */}
-                <div>
-                    <div className="py-8 px-4">
-                        <h1 className="sm:text-2xl text-xl font-bold sm:text-left text-justify mb-3">Important Links</h1>
-                        <ul>
-                            {footerLinks.map(({title,link},i)=>(
-                                <li key={i} className="py-2 hover:translate-x-1 duration-300 text-gray-200">
-                                    <Link className="hover:text-customBlue transition duration-200" to={link}>{title}</Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-                {/* Other Links */}
-                <div className="ml-12">
-                    <div className="py-8 px-4">
-                        <h1 className="sm:text-2xl text-xl font-bold sm:text-left text-justify mb-3">Links</h1>
-                        <ul>
-                            {mainFooterLinks.map(({title,link},i)=>(
-                                <li key={i} className="py-2 hover:translate-x-1 duration-300 text-gray-200">
-                                    <a className="hover:text-customBlue transition duration-200" href={link}>{title}</a>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
+
+            {/* Other Links */}
+            <div>
+              <h2 className="text-lg font-semibold mb-3">Links</h2>
+              <ul className="space-y-2">
+                {mainFooterLinks.map(({title, link}, i) => (
+                  <li key={i}>
+                    <a
+                      href={link}
+                      className="text-gray-300 hover:text-customBlue text-sm transition duration-200"
+                    >
+                      {title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
+          </div>
+        </div>
+
+        {/* Copyright - Added at the bottom */}
+        <div className="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400 text-sm">
+          © {new Date().getFullYear()} PriceChase. All rights reserved.
         </div>
       </div>
     </div>

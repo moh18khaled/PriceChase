@@ -1,77 +1,109 @@
-import { createContext, useState, useEffect, ReactNode } from "react";
+// src/context/UserContext.tsx
+import { createContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
 
-interface AuthState {
-  userDetails?: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    // Add other fields as needed
+// src/context/interfaces.ts
+export interface IUser {
+  id: string;
+  firstName: string;
+  email: string;
+  role: 'user' | 'admin' | "";
+  profilePicture?: {
+    url: string;
   };
+  // Add other user properties as needed
 }
 
-interface UserContextType {
-  auth: AuthState;
-  setAuth: (auth: AuthState) => void;
-  businessOwnerAuth: any;
-  setBusinessOwnerAuth: (auth: any) => void;
+export interface IUserContext {
+  auth: IUser | null;
+  setAuth: React.Dispatch<React.SetStateAction<IUser | null>>;
+  adminAuth: IUser | null;
+  setAdminAuth: React.Dispatch<React.SetStateAction<IUser | null>>;
   profilePicture: string;
-  setProfilePicture: (picture: string) => void;
+  setProfilePicture: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const User = createContext<UserContextType>({
-  auth: {},
-  setAuth: () => {},
-  businessOwnerAuth: {},
-  setBusinessOwnerAuth: () => {},
-  profilePicture: "",
-  setProfilePicture: () => {},
-});
-
-interface UserProviderProps {
-  children: ReactNode;
+export interface IProps {
+  children: React.ReactNode;
 }
 
-export const UserProvider = ({ children }: UserProviderProps) => {
-  const [auth, setAuth] = useState<AuthState>({});
-  const [businessOwnerAuth, setBusinessOwnerAuth] = useState({});
+export const UserContext = createContext<IUserContext | null>(null);
+
+export const UserProvider: React.FC<IProps> = ({ children }) => {
+  const [auth, setAuth] = useState<IUser | null>(null);
+  const [adminAuth, setAdminAuth] = useState<IUser | null>(null);
   const [profilePicture, setProfilePicture] = useState("");
 
   // Load state from cookies on initial render
   useEffect(() => {
-    const storedAuth = Cookies.get("auth");
-    const storedBusinessOwnerAuth = Cookies.get("businessOwnerAuth");
-    const storedProfilePicture = Cookies.get("profilePicture");
+    const loadFromCookies = () => {
+      try {
+        const storedAuth = Cookies.get("auth");
+        const storedAdminAuth = Cookies.get("adminAuth");
+        const storedProfilePicture = Cookies.get("profilePicture");
 
-    if (storedAuth) {
-      setAuth(JSON.parse(storedAuth));
-    }
-    if (storedBusinessOwnerAuth) {
-      setBusinessOwnerAuth(JSON.parse(storedBusinessOwnerAuth));
-    }
-    if (storedProfilePicture) {
-      setProfilePicture(storedProfilePicture);
-    }
+        if (storedAuth) {
+          setAuth(JSON.parse(storedAuth));
+        }
+        if (storedAdminAuth) {
+          setAdminAuth(JSON.parse(storedAdminAuth));
+        }
+        if (storedProfilePicture) {
+          setProfilePicture(storedProfilePicture);
+        }
+      } catch (error) {
+        console.error("Failed to parse cookie data:", error);
+        // Clear invalid cookies
+        Cookies.remove("auth");
+        Cookies.remove("adminAuth");
+        Cookies.remove("profilePicture");
+      }
+    };
+
+    loadFromCookies();
   }, []);
 
   // Save state to cookies whenever it changes
   useEffect(() => {
-    Cookies.set("auth", JSON.stringify(auth), { expires: 7 });
+    if (auth) {
+      Cookies.set("auth", JSON.stringify(auth), { expires: 7, secure: true });
+    } else {
+      Cookies.remove("auth");
+    }
   }, [auth]);
 
   useEffect(() => {
-    Cookies.set("businessOwnerAuth", JSON.stringify(businessOwnerAuth), { expires: 7 });
-  }, [businessOwnerAuth]);
+    if (adminAuth) {
+      Cookies.set("adminAuth", JSON.stringify(adminAuth), { 
+        expires: 7, 
+        secure: true 
+      });
+    } else {
+      Cookies.remove("adminAuth");
+    }
+  }, [adminAuth]);
 
   useEffect(() => {
-    Cookies.set("profilePicture", profilePicture, { expires: 7 });
+    if (profilePicture) {
+      Cookies.set("profilePicture", profilePicture, { expires: 7 });
+    } else {
+      Cookies.remove("profilePicture");
+    }
   }, [profilePicture]);
 
   return (
-    <User.Provider
-      value={{ auth, setAuth, businessOwnerAuth, setBusinessOwnerAuth, profilePicture, setProfilePicture }}
+    <UserContext.Provider
+      value={{
+        auth,
+        setAuth,
+        adminAuth: adminAuth,
+        setAdminAuth: setAdminAuth,
+        profilePicture,
+        setProfilePicture,
+        
+      }}
     >
       {children}
-    </User.Provider>
+    </UserContext.Provider>
   );
 };

@@ -19,36 +19,59 @@ interface WishlistItem {
 const YourWishlist = () => {
   const navigate = useNavigate();
   const [wishlistProducts, setWishlistProducts] = useState<WishlistItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [runUseEffect, setRun] = useState(0);
 
   useEffect(() => {
     const fetchWishlist = async () => {
       try {
+        setIsLoading(true);
         const response = await apiBaseUrl.get("/wishlist", { withCredentials: true });
-        setWishlistProducts(response.data);
+        
+        // Handle both response formats
+        const wishlistData = response.data.Wishlist || response.data;
+        setWishlistProducts(Array.isArray(wishlistData) ? wishlistData : []);
       } catch (error) {
         console.error("Error fetching wishlist:", error);
+        setWishlistProducts([]);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchWishlist();
-  }, []);
+  }, [runUseEffect]);
 
   const handleProductClick = (id: string) => {
     navigate(`/productPage/${id}`);
   };
 
   const handleRemoveFromWishlist = async (wishlistItemId: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent triggering the product click
+    e.stopPropagation();
     try {
-     const res = await apiBaseUrl.delete(`/wishlist/${wishlistItemId}`, { withCredentials: true });
-     console.log(res);
-      setWishlistProducts(wishlistProducts.filter(item => item._id !== wishlistItemId));
+      const res = await apiBaseUrl.delete(`/wishlist/${wishlistItemId}`, { 
+        withCredentials: true 
+      });
+      if (res.status === 200) {
+        setRun((prev) => prev + 1);
+      }
     } catch (error) {
       console.error("Error removing from wishlist:", error);
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="dark:bg-gray-600 dark:text-white min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-customBlue mx-auto"></div>
+          <p className="mt-4 text-lg">Loading your wishlist...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="dark:bg-gray-600 dark:text-white">
+    <div className="dark:bg-gray-600 dark:text-white min-h-screen">
       <h1 className="text-center text-2xl lg:text-4xl font-bold py-12">Your Wishlist</h1>
       {wishlistProducts.length === 0 ? (
         <div className="text-center py-20">
@@ -76,17 +99,16 @@ const YourWishlist = () => {
             }}
             className="w-full"
           >
-            {wishlistProducts.map(({ _id, productID }) => (
-              <SwiperSlide key={_id}>
+            {wishlistProducts.map((item) => (
+              <SwiperSlide key={item.productID._id}>
                 <div
-                  onClick={() => handleProductClick(productID._id)}
+                  onClick={() => handleProductClick(item.productID._id)}
                   className="cursor-pointer bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl 
                            transform hover:-translate-y-1 transition-all duration-300 h-full mx-2 my-4 
                            overflow-hidden group relative"
                 >
-                  {/* Remove from wishlist button */}
                   <button
-                    onClick={(e) => handleRemoveFromWishlist(productID._id, e)}
+                    onClick={(e) => handleRemoveFromWishlist(item.productID._id, e)}
                     className="absolute top-3 right-3 z-10 p-2 bg-white/80 dark:bg-gray-700/80 rounded-full 
                              hover:bg-red-500 hover:text-white transition-colors duration-200 shadow-md"
                     aria-label="Remove from wishlist"
@@ -94,28 +116,24 @@ const YourWishlist = () => {
                     <FaTimes className="w-4 h-4" />
                   </button>
 
-                  {/* Image Container */}
                   <div className="relative h-48 sm:h-56 w-full bg-gray-100 dark:bg-gray-700 overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent group-hover:from-black/10 transition-all duration-300" />
                     <img
-                      src={productID.Image}
-                      alt={productID.Title}
+                      src={item.productID.Image}
+                      alt={item.productID.Title}
                       className="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>
 
-                  {/* Content Container */}
                   <div className="p-4 space-y-3">
-                    {/* Title */}
                     <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white 
                                  line-clamp-2 group-hover:text-customBlue transition-colors duration-200">
-                      {productID.Title}
+                      {item.productID.Title}
                     </h3>
 
-                    {/* Price */}
                     <div className="flex items-center justify-between">
                       <p className="text-xl font-bold text-customBlue dark:text-customBlue">
-                        ${productID.Price}
+                        {item.productID.Price}$
                       </p>
                       <button
                         className="px-4 py-2 bg-customBlue text-white rounded-lg 

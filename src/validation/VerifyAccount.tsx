@@ -23,6 +23,7 @@ const VerifyAccount = () => {
           window.close();
         }, 2000);
       } catch (error) {
+        console.log(error);
         setMessage("Verification failed. The link may have expired.");
       } finally {
         setLoading(false);

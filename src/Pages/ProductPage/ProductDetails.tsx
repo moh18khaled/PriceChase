@@ -71,10 +71,11 @@ const ProductDetails = () => {
     fetchProductById();
   },[]);
   
+  
   return (
     <div className="w-[95%] mx-auto mt-4">
       <div className="lg:flex lg:space-x-8 space-y-6">
-        <div className="flex">
+        <div className="flex flex-col space-y-4 sm:flex-row">
           {/* div for column images */}
       {/* <div className="flex flex-col gap-3">
         {imageSize.map(({image})=>(
@@ -84,18 +85,18 @@ const ProductDetails = () => {
         ))}
       </div> */}
       {/* div for ProductImage */}
-      <div className="bg-[#EFEFEF] dark:bg-gray-500 w-[600px] sm:h-[900px] h-[700px]">
-        <img src={productImage} alt="ProductImage" className="w-[582px] sm:h-[588px] h-[488px] mt-[25%]"/>
+      <div className=" w-full sm:w-[500px] sm:h-[600px] h-[400px]">
+        <img src={productImage} alt="ProductImage" className="w-full sm:w-[582px] sm:h-[588px] h-full object-contain"/>
       </div>
         </div>
       {/* div for details */}
-      <div>
+      <div className="mt-8 sm:mt-0">
         <div>
           <div className="flex items-center space-x-2 mb-4">
-            <h1 className="sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-md font-bold">{title}</h1>
+            <h1 className="sm:text-lg md:text-xl lg:text-xl xl:text-3xl text-lg font-semibold">{title}</h1>
             {/* <img src={image23} alt="for h1" className="w-[50px] h-[50px]"/> */}
           </div>
-          <div className="flex items-center space-x-4 mb-12">
+          <div className="flex items-center space-x-4 mb-6 sm:mb-12">
               <div className="flex space-x-1">
               {[...Array(5)].map((_, index) => (
                       <FaStar
@@ -118,10 +119,10 @@ const ProductDetails = () => {
             <p className="text-[#F13F3F] text-xl">-11% <span className="text-lg text-[#A92D2D] dark:text-red-600">{currency}<span className="text-[#A92D2D] text-2xl">{productPrice}</span></span></p>
             <p>Last Price: <span className="line-through">EGP364.00</span></p>
           </div>
-          <hr className="border-[1px] text-[#EFEFEF] mb-24"/>
-          <div className="space-y-4">
-            <button onClick={addToWishlist} className="bg-[#EBC010] hover:bg-[#a79345] hover:duration-200 w-[100%] h-[78px] mx-auto text-white text-lg font-bold rounded-full">Add to Favorites</button>
-            <button className="bg-[#FF9500] hover:bg-[#cf8b2c] hover:duration-200 w-[100%] h-[78px] mx-auto text-white text-lg font-bold rounded-full">Add to Cart</button>
+          <hr className="border-[1px] text-[#EFEFEF] mb-12 sm:mb-24"/>
+          <div className="space-y-4 flex flex-col items-center">
+            <button onClick={addToWishlist} className="bg-[#EBC010] hover:bg-[#a79345] hover:duration-200 w-full sm:w-[80%] h-[50px] sm:h-[68px] text-white text-lg font-bold rounded-full">Add to Favorites</button>
+            <button className="bg-[#FF9500] hover:bg-[#cf8b2c] hover:duration-200 w-full sm:w-[80%] h-[50px] sm:h-[68px] text-white text-lg font-bold rounded-full">Add to Cart</button>
           </div>
         </div>
       </div>

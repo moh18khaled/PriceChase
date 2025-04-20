@@ -29,10 +29,8 @@ const DownNavbar = () => {
 
     // Handle category click
     const handleCategoryClick = async (id: string) => {
-        // Toggle category expansion
         setExpandedCategory(expandedCategory === id ? null : id);
         
-        // Fetch subcategories if not already fetched
         if (!categorySubcategories[id]) {
             try {
                 const response = await apiBaseUrl.get(`/categories/${id}/subcategories`);
@@ -47,15 +45,16 @@ const DownNavbar = () => {
     };
 
     return (
-        <nav className="bg-[#F5F5F5] shadow-lg dark:bg-gray-700 dark:text-white relative">
+        <nav id='categories' className="bg-[#FAFAFA] shadow-sm z-10 dark:bg-gray-700 dark:text-white relative border-b border-gray-100 dark:border-gray-600">
             {/* Mobile menu button */}
-            <div className="md:hidden flex justify-end p-4">
+            <div className="md:hidden flex justify-center p-4">
                 <button
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="text-gray- dark:text-white hover:text-gray-900 focus:outline-none"
+                    className="text-gray-700 dark:text-white hover:text-gray-900 focus:outline-none flex items-center gap-2"
                 >
+                    <span className="font-medium">Browse Categories</span>
                     <svg
-                        className="h-6 w-6"
+                        className="h-5 w-5"
                         fill="none"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -75,22 +74,20 @@ const DownNavbar = () => {
             {/* Categories container */}
             <div className={`container mx-auto ${isMobileMenuOpen ? 'block' : 'hidden'} md:block`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-4">
+                    <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 py-4">
                         {allCategories.map(({ _id, CategoryName }) => (
-                            <div key={_id} className="relative">
+                            <div key={_id} className="relative group">
                                 <button
                                     onClick={(e) => {
                                         e.preventDefault();
                                         handleCategoryClick(_id);
                                     }}
-                                    className="w-full text-left px-4 py-2 text-lg font-semibold text-gray-700 dark:text-white hover:text-customBlue 
-                                             transition duration-200 flex justify-between items-center"
+                                    className="px-4 py-2 text-lg font-medium text-gray-700 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 
+                                               transition-colors duration-200 flex items-center gap-1 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600"
                                 >
                                     <span>{CategoryName}</span>
                                     <svg
-                                        className={`w-4 h-4 transform transition-transform ${
-                                            expandedCategory === _id ? 'rotate-180' : ''
-                                        }`}
+                                        className={`w-4 h-4 transition-transform ${expandedCategory === _id ? 'rotate-180' : ''}`}
                                         fill="none"
                                         stroke="currentColor"
                                         viewBox="0 0 24 24"
@@ -101,19 +98,21 @@ const DownNavbar = () => {
                                 
                                 {/* Subcategories dropdown */}
                                 {expandedCategory === _id && categorySubcategories[_id] && (
-                                    <div className="mt-2 pl-4 space-y-2 bg-gradient-to-b from-gray-50 to-gray-100 
-                                                   dark:from-gray-700 dark:to-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600">
-                                        {categorySubcategories[_id].map(({ _id: subId, SubCategoryName }) => (
-                                            <Link
-                                                key={subId}
-                                                to = {`/categories/${_id}`}
-                                                className="block px-4 py-2 text-sm text-gray-600 dark:text-white hover:text-customBlue 
-                                                         hover:bg-white dark:hover:bg-gray-600 
-                                                         transition duration-200 rounded"
-                                            >
-                                                {SubCategoryName}
-                                            </Link>
-                                        ))}
+                                    <div className="absolute z-10 mt-2 w-56 origin-top-left rounded-lg bg-white dark:bg-gray-700 shadow-lg 
+                                                  ring-1 ring-black ring-opacity-5 focus:outline-none transition-all duration-200 
+                                                  animate-fade-in">
+                                        <div className="py-1">
+                                            {categorySubcategories[_id].map(({ _id: subId, SubCategoryName }) => (
+                                                <Link
+                                                    key={subId}
+                                                    to={`/categories/${_id}`}
+                                                    className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 
+                                                             transition-colors duration-150 first:rounded-t-lg last:rounded-b-lg"
+                                                >
+                                                    {SubCategoryName}
+                                                </Link>
+                                            ))}
+                                        </div>
                                     </div>
                                 )}
                             </div>

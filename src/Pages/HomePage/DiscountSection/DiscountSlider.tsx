@@ -2,7 +2,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { FaStar, FaSpinner } from 'react-icons/fa'; // Added FaSpinner
+import { FaStar, FaSpinner, FaEye } from 'react-icons/fa';
 import { MdLocalOffer } from 'react-icons/md';
 import { Pagination, Navigation } from 'swiper/modules';
 import { useEffect, useState } from 'react';
@@ -12,28 +12,28 @@ import { useNavigate } from 'react-router-dom';
 const DiscountSlider = () => {
   const navigate = useNavigate();
   const [discountProducts, setDiscountProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // Added loading state
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const getDiscountProducts = async () => {
-      setIsLoading(true); // Set loading to true when fetch starts
+      setIsLoading(true);
       try {
         const data = await fetchDiscountProducts();
         setDiscountProducts(data);
       } catch (error) {
         console.error('Error fetching discount products:', error);
       } finally {
-        setIsLoading(false); // Set loading to false when fetch completes
+        setIsLoading(false);
       }
     };
     getDiscountProducts();
   }, []);
 
   const handleProductClick = (id: string) => {
+    // Navigate to the specific product page with the ID
     navigate(`/productPage/${id}`);
   };
 
-  // Show spinner while loading
   if (isLoading) {
     return (
       <div className="w-full flex justify-center items-center py-20">
@@ -46,21 +46,25 @@ const DiscountSlider = () => {
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
       <Swiper
         modules={[Pagination, Navigation]}
-        pagination={{ clickable: true }}
+        pagination={{ 
+          clickable: true,
+          dynamicBullets: true,
+          dynamicMainBullets: 4,
+        }}
         navigation
         breakpoints={{
-          320: { slidesPerView: 1, spaceBetween: 10 },
-          640: { slidesPerView: 2, spaceBetween: 15 },
-          768: { slidesPerView: 2, spaceBetween: 20 },
-          1024: { slidesPerView: 3, spaceBetween: 25 },
-          1280: { slidesPerView: 4, spaceBetween: 30 },
+          320: { slidesPerView: 1, spaceBetween: 15 },
+          640: { slidesPerView: 2, spaceBetween: 20 },
+          768: { slidesPerView: 2, spaceBetween: 25 },
+          1024: { slidesPerView: 3, spaceBetween: 30 },
+          1280: { slidesPerView: 4, spaceBetween: 35 },
         }}
-        className="w-full"
+        className="w-full !pb-12"
       >
-        {discountProducts.map(({ _id, Image, Title, Price, AverageRating }) => (
+        {discountProducts.map(({ _id, Image, Title, Price, AverageRating, Currency, Views }) => (
           <SwiperSlide key={_id}>
             <div
-              onClick={() => handleProductClick(_id)}
+              onClick={() => handleProductClick(_id)} // Pass the _id to the handler
               className="cursor-pointer bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl 
                        transform hover:-translate-y-1 transition-all duration-300 h-full mx-2 my-4 
                        overflow-hidden group relative"
@@ -71,6 +75,12 @@ const DiscountSlider = () => {
                   <MdLocalOffer className="text-lg" />
                   <span>30% OFF</span>
                 </div>
+              </div>
+
+              {/* Views Counter */}
+              <div className="absolute top-4 right-4 z-10 bg-black/40 text-white px-2 py-1 rounded-full flex items-center gap-1 text-xs">
+                <FaEye className="text-sm" />
+                <span>{Views || 0}</span>
               </div>
 
               {/* Image Container */}
@@ -86,14 +96,14 @@ const DiscountSlider = () => {
               {/* Content Container */}
               <div className="p-4 space-y-3">
                 {/* Title */}
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white 
+                <h3 className="text-md sm:text-lg font-semibold text-gray-800 dark:text-white 
                              line-clamp-2 group-hover:text-customBlue transition-colors duration-200">
                   {Title}
                 </h3>
 
-                {/* Rating */}
-                <div className="flex flex-col sm:flex-row items-center gap-2 text-sm">
-                  <div className="flex items-center gap-1">
+                {/* Rating and Views (mobile) */}
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-1 text-sm">
                     {[...Array(5)].map((_, index) => (
                       <FaStar
                         key={index}
@@ -105,16 +115,22 @@ const DiscountSlider = () => {
                       />
                     ))}
                   </div>
+                  {/* Views counter for mobile */}
+                  <div className="sm:hidden flex items-center gap-1 text-gray-500 dark:text-gray-400 text-xs">
+                    <FaEye className="text-sm" />
+                    <span>{Views || 0}</span>
+                  </div>
                 </div>
 
                 {/* Price and CTA */}
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <p className="text-lg font-bold text-red-500 dark:text-red-400">
-                      {Price}$
+                      {Currency} {Price}$
                     </p>
                   </div>
                   <button
+                    
                     className="px-4 py-2 bg-customBlue text-white rounded-lg 
                              opacity-0 group-hover:opacity-100 transform translate-y-2 
                              group-hover:translate-y-0 transition-all duration-300"

@@ -12,9 +12,9 @@ import apiBaseUrl from "../config/axiosConfig"
 import Cookies from "js-cookie";
 import Swal from "sweetalert2"
 import axios from "axios"
-import { User } from "../context/context"
+import { UserContext } from "../context/context"
 const Login = () => {
-  const userNow = useContext(User);
+  const userNow = useContext(UserContext);
   console.log(userNow);
   const navigate = useNavigate();
 
@@ -29,9 +29,19 @@ const Login = () => {
   try {
     const response = await apiBaseUrl.post("/user/login",data,{withCredentials : true});
     console.log(response);
-    const userDetails = response.data.data.user;
-    console.log(userDetails);
-    userNow.setAuth({ userDetails });
+    const role = response.data.data.user.role;
+        const userDetails = response.data.data.user;
+        const adminDetails = response.data.data.user;
+        const getProfilePicture = response.data.data.user.profilePicture;
+
+        if(role === "user"){
+          userNow?.setAuth(userDetails);
+          userNow?.setProfilePicture(getProfilePicture);
+        }
+        else if(role === "admin"){
+          userNow?.setAdminAuth(adminDetails);
+          userNow?.setProfilePicture(getProfilePicture);
+        }
 
     Cookies.set("userEmail",data.email,{expires : 7});
 
@@ -44,7 +54,12 @@ const Login = () => {
       draggable: true,
       }).then((result)=>{
       if(result.isConfirmed){
+        if(role === "user"){
           navigate("/");
+          }
+          else if(role === "admin"){
+            navigate("/admin");
+          }
       }
       });
     }

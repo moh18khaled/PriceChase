@@ -6,6 +6,7 @@ import CategoryPage from "./Pages/CategoryPage/CategoryPage";
 import ProductPage from "./Pages/ProductPage/ProductPage";
 import { UserProvider } from "./context/context";
 import ProfilePage from "./Pages/ProfilePage";
+import AdminDashboard from "./admin";
 
 const App = ()=>{
   return (
@@ -17,7 +18,8 @@ const App = ()=>{
       <Route path="/login" element = {<Login />} />
       <Route path="/categories/:id" element = { <CategoryPage />} />
       <Route path="/productPage/:id" element = {<ProductPage />} />
-      <Route path="profile-page" element = {<ProfilePage />} />
+      <Route path="/profile-page" element = {<ProfilePage />} />
+      <Route path="/admin" element = {<AdminDashboard />} />
     </Routes>
     </UserProvider>
     

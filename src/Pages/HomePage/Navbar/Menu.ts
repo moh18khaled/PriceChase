@@ -13,7 +13,7 @@ export const upMenu : IUpMenu[] = [
     },
     {
         id:3,
-        name : "Descount Section",
+        name : "Discount Section",
         link : "/#",
     },
 ]
