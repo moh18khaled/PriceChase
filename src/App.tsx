@@ -7,6 +7,10 @@ import ProductPage from "./Pages/ProductPage/ProductPage";
 import { UserProvider } from "./context/context";
 import ProfilePage from "./Pages/ProfilePage";
 import AdminDashboard from "./admin";
+import FetchNewProducts from "./admin/FetchNewProducts";
+import UpdateProductStatus from "./admin/UpdateProductStatus";
+import ManageProducts from "./admin/ManageProducts";
+import ManageUsers from "./admin/ManageUsers";
 
 const App = ()=>{
   return (
@@ -19,7 +23,14 @@ const App = ()=>{
       <Route path="/categories/:id" element = { <CategoryPage />} />
       <Route path="/productPage/:id" element = {<ProductPage />} />
       <Route path="/profile-page" element = {<ProfilePage />} />
-      <Route path="/admin" element = {<AdminDashboard />} />
+      <Route path="/admin" element = {<AdminDashboard />} >
+      <Route path="users" element = {<ManageUsers />} />
+      <Route path="products" element = {<ManageProducts />} />
+      <Route path="fetch-products" element = {<FetchNewProducts />} />
+      <Route path="product-status" element = {<UpdateProductStatus />} />
+      <Route path="auto-updates" element = {<p>update-auto</p>} />
+      <Route path="schedule-fetch" element = {<p>schedule-fetch</p>} />
+      </Route>
     </Routes>
     </UserProvider>
     
