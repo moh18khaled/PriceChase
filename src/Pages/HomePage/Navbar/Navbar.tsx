@@ -8,12 +8,15 @@ import { UserContext } from '../../../context/context';
 import apiBaseUrl from '../../../config/axiosConfig';
 import Cookies from "js-cookie";
 import Swal from "sweetalert2"
-
-const Navbar = () => {
+type SearchBarProps = {
+  onDebouncedSearch: (query: string) => void;
+};
+const Navbar : React.FC<SearchBarProps> = ({onDebouncedSearch}) => {
   const user = useContext(UserContext);
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [inputSearch,setInputSearch] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return document.documentElement.classList.contains('dark');
@@ -33,6 +36,14 @@ const Navbar = () => {
     setIsDarkMode(!isDarkMode);
     document.documentElement.classList.toggle('dark');
   };
+
+  useEffect(()=>{
+    const timeout = setTimeout(() => {
+      onDebouncedSearch(inputSearch);
+    }, 500);
+
+    return ()=> clearTimeout(timeout);
+  },[inputSearch,onDebouncedSearch])
 
   useEffect(() => {
     const checkLoginStatus = () => {
@@ -163,6 +174,8 @@ const Navbar = () => {
             <div className='relative hidden sm:block'>
               <input
                 type="text"
+                value={inputSearch}
+                onChange={(e)=>setInputSearch(e.target.value)}
                 placeholder='Search'
                 className='w-[200px] lg:w-[250px] transition-all duration-300 rounded-lg border 
                          border-gray-300 px-4 py-2 focus:outline-none focus:border-customBlue 
@@ -279,6 +292,8 @@ const Navbar = () => {
               <div className='relative mb-6 sm:hidden'>
                 <input
                   type="text"
+                  value={inputSearch}
+                  onChange={(e)=>setInputSearch(e.target.value)}
                   placeholder='Search'
                   className='w-full transition-all duration-300 rounded-lg border 
                            border-gray-300 px-4 py-2 focus:outline-none focus:border-customBlue

@@ -17,6 +17,7 @@ const ProductDetails = () => {
   const [productPrice,setProductPrice] = useState("");
   const [currency,setCurrency] = useState("");
   const [averageRating,setAverageRating] = useState(0);
+  const [productPage,setProductPage] = useState("");
   useEffect(()=>{
     const fetchProductById = async()=>{
       try {
@@ -27,6 +28,7 @@ const ProductDetails = () => {
         setProductPrice(response.data.data.Price);
         setCurrency(response.data.data.Currency);
         setAverageRating(response.data.data.AverageRating);
+        setProductPage(response.data.data.ProductPage);
       } catch (error) {
         console.log(error);
       }
@@ -115,7 +117,9 @@ const ProductDetails = () => {
           </div>
           <hr className="border-[1px] text-[#EFEFEF] mb-4"/>
           <div className="space-y-2">
+            <a href={productPage} target="_blank">
             <button className="bg-[#F02C2C] hover:bg-[#771d1d] hover:duration-200 w-[229px] h-[51px] text-white rounded-md">Limited time deal</button>
+            </a>
             <p className="text-[#F13F3F] text-xl">-11% <span className="text-lg text-[#A92D2D] dark:text-red-600">{currency}<span className="text-[#A92D2D] text-2xl">{productPrice}</span></span></p>
             <p>Last Price: <span className="line-through">EGP364.00</span></p>
           </div>
