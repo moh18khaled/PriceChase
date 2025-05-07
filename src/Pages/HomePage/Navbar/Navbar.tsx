@@ -8,15 +8,20 @@ import { UserContext } from '../../../context/context';
 import apiBaseUrl from '../../../config/axiosConfig';
 import Cookies from "js-cookie";
 import Swal from "sweetalert2"
+import logo from "../../../assets/images/logo (3).png"
+
 type SearchBarProps = {
   onDebouncedSearch: (query: string) => void;
+  showCategories: boolean;
+  setShowCategories: (show: boolean) => void;
 };
-const Navbar : React.FC<SearchBarProps> = ({onDebouncedSearch}) => {
+
+const Navbar: React.FC<SearchBarProps> = ({ onDebouncedSearch, showCategories, setShowCategories }) => {
   const user = useContext(UserContext);
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [inputSearch,setInputSearch] = useState("");
+  const [inputSearch, setInputSearch] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return document.documentElement.classList.contains('dark');
@@ -31,26 +36,24 @@ const Navbar : React.FC<SearchBarProps> = ({onDebouncedSearch}) => {
     }
   }, []);
 
-  // Toggle theme
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
     document.documentElement.classList.toggle('dark');
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     const timeout = setTimeout(() => {
       onDebouncedSearch(inputSearch);
     }, 500);
 
-    return ()=> clearTimeout(timeout);
-  },[inputSearch,onDebouncedSearch])
+    return () => clearTimeout(timeout);
+  }, [inputSearch, onDebouncedSearch]);
 
   useEffect(() => {
     const checkLoginStatus = () => {
       const hasAuth = user?.auth || user?.adminAuth;
       setIsLoggedIn(!!hasAuth);
     };
-
     checkLoginStatus();
   }, [user?.auth, user?.adminAuth]);
 
@@ -103,7 +106,6 @@ const Navbar : React.FC<SearchBarProps> = ({onDebouncedSearch}) => {
   const currentUser = user?.auth || user?.adminAuth;
   const profilePicture = user?.profilePicture || currentUser?.profilePicture?.url;
 
-  // Toggle menu and prevent scroll when menu is open
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
     document.body.style.overflow = !menuOpen ? 'hidden' : 'unset';
@@ -114,7 +116,16 @@ const Navbar : React.FC<SearchBarProps> = ({onDebouncedSearch}) => {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
-    setMenuOpen(false); // Close mobile menu if open
+    setMenuOpen(false);
+  };
+
+  const handleCategoriesClick = () => {
+    setShowCategories(!showCategories);
+    if (!showCategories) {
+      setTimeout(() => {
+        scrollToSection('categories');
+      }, 100);
+    }
   };
 
   return (
@@ -124,8 +135,13 @@ const Navbar : React.FC<SearchBarProps> = ({onDebouncedSearch}) => {
         <div className='w-11/12 mx-auto flex items-center justify-between'>
           {/* Logo */}
           <div className='flex items-center gap-4'>
-            <Link to='/' className='font-bold text-2xl sm:text-3xl'>
-              Price<span className='text-customBlue'>Chase</span>
+            <Link to="/" className='flex items-center'>
+              <img 
+                src={logo} 
+                alt="logo" 
+                className='w-20 h-20 md:w-28 md:h-28 rounded-full object-contain scale-125' 
+                style={{ transform: 'translateY(1px)', maxHeight: '100%' }} 
+              />            
             </Link>
           </div>
 
@@ -150,8 +166,10 @@ const Navbar : React.FC<SearchBarProps> = ({onDebouncedSearch}) => {
                     </button>
                   ) : name === 'Categories' ? (
                     <button
-                      onClick={() => scrollToSection('categories')}
-                      className='text-lg font-semibold hover:text-customBlue transition-colors duration-200'
+                      onClick={handleCategoriesClick}
+                      className={`text-lg font-semibold transition-colors duration-200 ${
+                        showCategories ? 'text-customBlue' : 'hover:text-customBlue'
+                      }`}
                     >
                       {name}
                     </button>
@@ -175,7 +193,7 @@ const Navbar : React.FC<SearchBarProps> = ({onDebouncedSearch}) => {
               <input
                 type="text"
                 value={inputSearch}
-                onChange={(e)=>setInputSearch(e.target.value)}
+                onChange={(e) => setInputSearch(e.target.value)}
                 placeholder='Search'
                 className='w-[200px] lg:w-[250px] transition-all duration-300 rounded-lg border 
                          border-gray-300 px-4 py-2 focus:outline-none focus:border-customBlue 
@@ -293,7 +311,7 @@ const Navbar : React.FC<SearchBarProps> = ({onDebouncedSearch}) => {
                 <input
                   type="text"
                   value={inputSearch}
-                  onChange={(e)=>setInputSearch(e.target.value)}
+                  onChange={(e) => setInputSearch(e.target.value)}
                   placeholder='Search'
                   className='w-full transition-all duration-300 rounded-lg border 
                            border-gray-300 px-4 py-2 focus:outline-none focus:border-customBlue
@@ -308,22 +326,33 @@ const Navbar : React.FC<SearchBarProps> = ({onDebouncedSearch}) => {
                   <li key={idx}>
                     {name === 'Popular Products' ? (
                       <button
-                        onClick={() => scrollToSection('popular-products')}
+                        onClick={() => {
+                          scrollToSection('popular-products');
+                          setMenuOpen(false);
+                        }}
                         className='text-lg font-semibold hover:text-customBlue transition-colors duration-200 w-full text-left'
                       >
                         {name}
                       </button>
                     ) : name === 'Discount Section' ? (
                       <button
-                        onClick={() => scrollToSection('discount-products')}
+                        onClick={() => {
+                          scrollToSection('discount-products');
+                          setMenuOpen(false);
+                        }}
                         className='text-lg font-semibold hover:text-customBlue transition-colors duration-200 w-full text-left'
                       >
                         {name}
                       </button>
                     ) : name === 'Categories' ? (
                       <button
-                        onClick={() => scrollToSection('categories')}
-                        className='text-lg font-semibold hover:text-customBlue transition-colors duration-200 w-full text-left'
+                        onClick={() => {
+                          handleCategoriesClick();
+                          setMenuOpen(false);
+                        }}
+                        className={`text-lg font-semibold transition-colors duration-200 w-full text-left ${
+                          showCategories ? 'text-customBlue' : 'hover:text-customBlue'
+                        }`}
                       >
                         {name}
                       </button>

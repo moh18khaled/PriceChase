@@ -77,37 +77,6 @@ const ManageProducts = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      const result = await Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      });
-
-      if (result.isConfirmed) {
-        await apiBaseUrl.delete(`/products/${id}`);
-        Swal.fire(
-          'Deleted!',
-          'The product has been deleted.',
-          'success'
-        );
-        fetchProducts(); // Refresh the list
-      }
-    } catch (error) {
-      console.error('Error deleting product:', error);
-      Swal.fire({
-        title: 'Error',
-        text: 'Failed to delete product',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
-    }
-  };
 
   const handleVisibility = async (id: string) => {
     try {
@@ -187,15 +156,7 @@ const ManageProducts = () => {
                       >
                         {product.hidden ? <FaEyeSlash className="h-5 w-5" /> : <FaEye className="h-5 w-5" />}
                       </button>
-                      <button
-                        onClick={() => handleDelete(product._id)}
-                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 
-                                 transition-colors duration-200 p-2 rounded-full 
-                                 hover:bg-red-50 dark:hover:bg-red-900/20"
-                        title="Delete Product"
-                      >
-                        <FaTrash className="h-5 w-5" />
-                      </button>
+                      
                     </div>
                   </td>
                 </tr>

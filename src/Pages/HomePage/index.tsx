@@ -8,13 +8,18 @@ import SearchResults from "./Search/SearchResults"
 import { useState } from "react"
 
 const HomePage = () => {
+  const [showCategories, setShowCategories] = useState(false);
   const [query, setQuery] = useState('');
   return (
     <div className="dark:bg-gray-900 dark:text-white">
-      <Navbar onDebouncedSearch={setQuery}/>
-      <DownNavbar />
-      {/* <Hero /> */}
+      <Navbar onDebouncedSearch={setQuery}
+      showCategories={showCategories}
+      setShowCategories={setShowCategories}
+      />
+      <DownNavbar visible={showCategories} 
+      onClose={() => setShowCategories(false)} />
       {query.trim() !== `` && <SearchResults query={query} />}
+      <Hero />
       <PopularProducts />
       <DicountSection />
       <Footer />

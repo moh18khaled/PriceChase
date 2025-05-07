@@ -1,4 +1,3 @@
-import React from 'react'
 import Slider from 'react-slick';
 import { imageList } from './Lists';
 const Hero = () => {
@@ -15,7 +14,7 @@ const Hero = () => {
     pauseOnFocus: true,
   };
   return (
-    <div className='mb-24 -mt-36'>
+    <div className='mb-24 -mt-36 z-0'>
       {/* background pattern 
       <div className='h-[700px] w-[700px] bg-customBlsue/40 dark:bg-gray-900/40 absolute -top-1/2 right-0 rounded-3xl rotate-45 -z-10'>
 
