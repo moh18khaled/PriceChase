@@ -1,6 +1,12 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import apiBaseUrl from "../../config/axiosConfig";
+import Swal from "sweetalert2";
+import { UserContext } from "../../context/context";
+import Cookies from "js-cookie";
+import { Link, useNavigate } from "react-router-dom";
 const ProfileDetails = () => {
+  const user = useContext(UserContext);
+  const navigate = useNavigate();
     const [userAccountData,setUserAccountData] = useState({
         firstName : "",
         lastName : "",
@@ -28,6 +34,44 @@ const ProfileDetails = () => {
      fetchedData();
     },[])
 
+    // delete Account
+    const deleteAccount = async () => {
+      try {
+          const result = await Swal.fire({
+              title: "Are you sure to delete your account?",
+              text: "You won't be able to revert this!",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#3085d6",
+              cancelButtonColor: "#d33",
+              confirmButtonText: "Yes, delete it!",
+          });
+
+          if (result.isConfirmed) {
+              await apiBaseUrl.delete(`/user/account`, { withCredentials: true });
+        Cookies.remove("auth");
+        Cookies.remove("adminAuth");
+        Cookies.remove("profilePicture");
+        Cookies.remove("userEmail");
+
+        user?.setAuth(null);
+        user?.setAdminAuth(null);
+        user?.setProfilePicture("");
+              Swal.fire({
+                  title: "Deleted!",
+                  text: "Your account has been deleted.",
+                  icon: "success",
+              }).then(() => navigate("/"));
+          }
+      } catch (error) {
+          console.log(error);
+          Swal.fire({
+              icon: "error",
+              title: "Failed to Delete Account",
+          });
+      }
+  };
+
   return (
     <div className="dark:bg-gray-600 dark:text-white">
       <div className="py-12 px-5 lg:py-18 lg:px-24">
@@ -40,12 +84,14 @@ const ProfileDetails = () => {
             <p className="text-gray-500 dark:text-gray-200 md:text-lg mb-4">{userAccountData.email}</p>
           </div>
           <div className="flex space-x-4 justify-center lg:justify-start">
+            <Link to={"/update-profile-page"}>
             <button className="flex p-2 bg-customBlue dark:bg-yellow-500 rounded-xl hover:rounded-3xl dark:hover:bg-yellow-600 transition-all duration-300 text-white">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
             </button>
-            <button className="flex p-2 bg-red-500 rounded-xl hover:rounded-3xl hover:bg-red-600 transition-all duration-300 text-white">
+            </Link>
+            <button onClick={()=>deleteAccount()} className="flex p-2 bg-red-500 rounded-xl hover:rounded-3xl hover:bg-red-600 transition-all duration-300 text-white">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>

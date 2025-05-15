@@ -51,7 +51,6 @@ const DownNavbar: React.FC<DownNavbarProps> = ({ visible, onClose }) => {
 
   return (
     <nav 
-      id='categories'
       className={`bg-[#FAFAFA] shadow-sm z-40 dark:bg-gray-700 dark:text-white border-b border-gray-100 dark:border-gray-600 transition-all duration-300 relative ${
         visible ? 'opacity-100 max-h-[500px]' : 'opacity-0 max-h-0 overflow-hidden'
       }`}

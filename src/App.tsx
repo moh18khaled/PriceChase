@@ -13,6 +13,9 @@ import UpdateProductStatus from "./admin/UpdateProductStatus";
 import ManageProducts from "./admin/ManageProducts";
 import ManageUsers from "./admin/ManageUsers";
 import SplashScreen from "./Pages/SplachScreen";
+import ScrollToTop from "./Pages/ScrollToTop";
+import UpdateProfilePage from "./Pages/ProfilePage/UpdateProfilePage";
+import VerifyAccount from "./validation/VerifyAccount";
 
 const App: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
@@ -23,20 +26,21 @@ const App: React.FC = () => {
 
   return (
     <UserProvider>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-account" element = {<VerifyAccount />} />
         <Route path="/login" element={<Login />} />
         <Route path="/categories/:id" element={<CategoryPage />} />
         <Route path="/productPage/:id" element={<ProductPage />} />
         <Route path="/profile-page" element={<ProfilePage />} />
+        <Route path="/update-profile-page" element={<UpdateProfilePage />} />
         <Route path="/admin" element={<AdminDashboard />}>
           <Route path="users" element={<ManageUsers />} />
           <Route path="products" element={<ManageProducts />} />
           <Route path="fetch-products" element={<FetchNewProducts />} />
           <Route path="product-status" element={<UpdateProductStatus />} />
-          <Route path="auto-updates" element={<p>update-auto</p>} />
-          <Route path="schedule-fetch" element={<p>schedule-fetch</p>} />
         </Route>
       </Routes>
     </UserProvider>
