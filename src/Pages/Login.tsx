@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {faCartShopping} from "@fortawesome/free-solid-svg-icons"
-import mymage from "../assets/images/register&login.png"
+import mymage from "../assets/images/whiteLogin.png"
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons"
 import {faLock,faEye,faEyeSlash } from "@fortawesome/free-solid-svg-icons"
 import { useContext, useState } from "react"
@@ -87,10 +87,11 @@ if(axios.isAxiosError(error)){
   };
   return (
     <div className="shadow-md dark:bg-gray-700 dark:text-white lg:h-screen w-full max-w-screen-2xl   gap-3 bg-customBlue lg:flex md:flex">
-      <div className="">
-        <FontAwesomeIcon icon={faCartShopping} className="w-10 h-10 p-5 text-white" />
-      <h1 className="lg:pl-16 lg:pt-8 pl-10 pt-5 text-white text-[40px] font-semibold h-12 text-center">Welcome Back</h1>
-      <img src={mymage} alt="" className="lg:mt-16 mt-10 mx-auto " />
+      <div className="md:w-[40%]">
+      <h1 className="lg:pt-8 pt-5 text-white text-[40px] font-semibold h-12 text-center">Welcome Back To</h1>
+      <Link to={"/"}>
+      <img src={mymage} alt="" className="mt-4 w-[70%] lg:w-[100%] mx-auto " />
+      </Link>
       </div>
       <div className="shadow-md  dark:bg-gray-900 dark:text-white w-full max-w-[960px]  bg-white rounded-tl-[40px] rounded-tr-[40px] ml-auto lg:rounded-tl-[40px] lg:rounded-bl-[40px] lg:rounded-tr-none md:rounded-tr-none ">
         <h1 className="pt-10 font-bold lg:text-[40px] text-[30px] text-center mb-4">Sign In</h1>
@@ -111,7 +112,9 @@ if(axios.isAxiosError(error)){
             <FontAwesomeIcon icon={isVisible?faEyeSlash :faEye} onClick={togglePasswordVisibility} className="absolute right-4 top-9 w-5 h-5 dark:text-gray-900" />
             <input type={isVisible? "text" : "password"} id="first-name" {...register("password")} className="h-12 pl-12 border-[1px] border-gray-600 rounded-md  focus:outline-none focus:border-[2px] focus:border-customBlue" />
             <p className="block text-red-700 font-semibold text-sm">{errors.password?.message}</p>
+            <Link to={"/forgot-password"}>
             <span className="cursor-pointer text-customBlue">Forget Password?</span>
+            </Link>
             </div>
             
             

@@ -19,8 +19,8 @@ interface InitialData {
 }
 
 interface CloudinaryResponse {
-  url: string;
-  public_id: string;
+  profilePictureUrl: string;
+  profilePicturePublic_id: string;
 }
 
 const UpdateProfilePage: React.FC = () => {
@@ -115,8 +115,8 @@ const UpdateProfilePage: React.FC = () => {
 
       if (formData.profilePicture instanceof File) {
         const result = await uploadImageToCloudinary(formData.profilePicture);
-        profilePictureUrl = result.url;
-        profilePicturePublic_id = result.public_id;
+        profilePictureUrl = result.profilePictureUrl;
+        profilePicturePublic_id = result.profilePicturePublic_id;
       }
 
       const updateData = new FormData();

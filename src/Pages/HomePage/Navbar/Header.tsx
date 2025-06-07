@@ -7,7 +7,7 @@ import { UserContext } from '../../../context/context';
 import apiBaseUrl from '../../../config/axiosConfig';
 import Cookies from "js-cookie";
 import Swal from "sweetalert2"
-import logo from "../../../assets/images/logo (3).png"
+import logo from "../../../assets/images/new_logo.png"
 
 type SearchBarProps = {
   onDebouncedSearch: (query: string) => void;
@@ -111,17 +111,16 @@ const Header: React.FC<SearchBarProps> = ({ onDebouncedSearch }) => {
   return (
     <nav className='sticky top-0 z-50 bg-white dark:bg-gray-900 dark:text-white'>
       {/* Upper Navbar */}
-      <div className='py-4 shadow-md'>
-        <div className='w-11/12 mx-auto'>
+      <div className='py-3 shadow-md'>
+        <div className='w-10/12 mx-auto h-12 flex items-center justify-between'>
           {/* Mobile Layout (logo + theme + search + menu toggle) */}
-          <div className='sm:hidden flex items-center justify-between gap-2'>
+          <div className='sm:hidden flex items-center justify-between w-full'>
             {/* Logo */}
             <Link to="/" className='flex items-center'>
               <img 
                 src={logo} 
                 alt="logo" 
-                className='w-14 h-14 rounded-full object-contain scale-125' 
-                style={{ transform: 'translateY(1px)', maxHeight: '100%' }} 
+                className='w-20 h-20 rounded-full object-contain' 
               />            
             </Link>
             
@@ -137,7 +136,7 @@ const Header: React.FC<SearchBarProps> = ({ onDebouncedSearch }) => {
             </button>
 
             {/* Centered Search Bar - mobile */}
-            <div className='flex-1 max-w-xs'>
+            <div className='flex-1 max-w-xs mx-2'>
               <div className='relative w-full'>
                 <input
                   type="text"
@@ -162,14 +161,13 @@ const Header: React.FC<SearchBarProps> = ({ onDebouncedSearch }) => {
           </div>
 
           {/* Desktop Layout */}
-          <div className='hidden sm:flex items-center justify-between gap-4'>
+          <div className='hidden sm:flex items-center justify-between w-full'>
             {/* Logo */}
             <Link to="/" className='flex items-center'>
               <img 
                 src={logo} 
                 alt="logo" 
-                className='w-20 h-20 md:w-28 md:h-28 rounded-full object-contain scale-125' 
-                style={{ transform: 'translateY(1px)', maxHeight: '100%' }} 
+                className='w-28 h-28 rounded-full object-contain' 
               />            
             </Link>
 

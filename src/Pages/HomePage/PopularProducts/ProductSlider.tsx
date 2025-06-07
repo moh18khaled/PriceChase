@@ -12,6 +12,7 @@ const ProductSlider = () => {
   const navigate = useNavigate();
   const [popularProducts, setPopularProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [emptyPopular,setEmptyPopular] = useState("");
 
   useEffect(() => {
     const getPopularProducts = async () => {

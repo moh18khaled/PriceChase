@@ -1,52 +1,110 @@
 import { useEffect, useState } from "react";
 import apiBaseUrl from "../../../config/axiosConfig";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { FaEye, FaSpinner, FaStar } from "react-icons/fa";
+import { FaEye, FaSpinner, FaStar, FaExclamationTriangle } from "react-icons/fa";
 import { Navigation, Pagination } from "swiper/modules";
 import { useNavigate } from "react-router-dom";
 
+type Product = {
+  _id: string;
+  Image: string;
+  Title: string;
+  Price: number;
+  AverageRating: number;
+  Currency: string;
+  Views: number;
+};
+
+type ApiResponse = {
+  products?: Product[];
+  error?: string;
+};
+
 type SearchResultsProps = {
-    query: string;
-  };
-const SearchResults : React.FC<SearchResultsProps> = ({query}) => {
-    const navigate = useNavigate();
-    const [results,setResults] = useState([]);
-    const [loading,setLoading] = useState(false);
+  query: string;
+};
 
-    useEffect(()=>{
-        if(!query){
-            setResults([]);
-            return;
+const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
+  const navigate = useNavigate();
+  const [results, setResults] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!query) {
+      setResults([]);
+      setError(null);
+      return;
+    }
+
+    const fetchSearchResults = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await apiBaseUrl.get<ApiResponse>(`/products/search?query=${query}`);
+        
+        if (response.data.error) {
+          setError(response.data.error);
+          setResults([]);
+        } else if (response.data.products && response.data.products.length === 0) {
+          setError("No products found matching your search.");
+          setResults([]);
+        } else {
+          setResults(response.data.products || []);
         }
-
-        const fetchSearchResults = async ()=>{
-            try {
-                setLoading(true);
-                const response = await apiBaseUrl.get(`/products/search?query=${query}`);
-                console.log(response);
-                setResults(response.data.products);
-            } catch (error) {
-                console.log(error);
-                setResults([]);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchSearchResults();
-    },[query])
-
-    const handleProductClick = (id: string) => {
-        navigate(`/productPage/${id}`);
-      };
-
-      if (loading) {
-        return (
-          <div className="w-full flex justify-center items-center py-20">
-            <FaSpinner className="animate-spin text-4xl text-customBlue" />
-          </div>
-        );
+      } catch (error) {
+        console.log(error);
+        setError("An error occurred while searching. Please try again.");
+        setResults([]);
+      } finally {
+        setLoading(false);
       }
-      
+    };
+    
+    const debounceTimer = setTimeout(() => {
+      fetchSearchResults();
+    }, 500);
+
+    return () => clearTimeout(debounceTimer);
+  }, [query]);
+
+  const handleProductClick = (id: string) => {
+    navigate(`/productPage/${id}`);
+  };
+
+  if (loading) {
+    return (
+      <div className="w-full flex justify-center items-center py-20">
+        <FaSpinner className="animate-spin text-4xl text-customBlue" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center py-20 px-4 text-center">
+        <FaExclamationTriangle className="text-4xl text-yellow-500 mb-4" />
+        
+        <p className="text-gray-600 dark:text-gray-400 max-w-md">
+          {error}
+        </p>
+      </div>
+    );
+  }
+
+  if (results.length === 0 && !query) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center py-20 px-4 text-center">
+        <h3 className="text-xl font-medium text-gray-800 dark:text-white mb-2">
+          Start Searching
+        </h3>
+        <p className="text-gray-600 dark:text-gray-400 max-w-md">
+          Enter a search term to find products
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
       <Swiper
@@ -58,29 +116,27 @@ const SearchResults : React.FC<SearchResultsProps> = ({query}) => {
         }}
         navigation
         breakpoints={{
-          320: { slidesPerView: 1, spaceBetween: 15 }, // Increased space
+          320: { slidesPerView: 1, spaceBetween: 15 },
           640: { slidesPerView: 2, spaceBetween: 20 },
           768: { slidesPerView: 2, spaceBetween: 25 },
           1024: { slidesPerView: 3, spaceBetween: 30 },
           1280: { slidesPerView: 4, spaceBetween: 35 },
         }}
-        className="w-full !pb-12" // Added padding for pagination space
+        className="w-full !pb-12"
       >
-        {results.length>0 ? results.map(({ _id, Image, Title, Price, AverageRating, Currency, Views }) => (
+        {results.map(({ _id, Image, Title, Price, AverageRating, Currency, Views }) => (
           <SwiperSlide key={_id}>
             <div
               onClick={() => handleProductClick(_id)}
               className="cursor-pointer bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl 
                        transform hover:-translate-y-1 transition-all duration-300 h-full mx-2 my-4 
-                       overflow-hidden group relative" // Added relative
+                       overflow-hidden group relative"
             >
-              {/* Views Counter */}
               <div className="absolute top-4 right-4 z-10 bg-black/40 text-white px-2 py-1 rounded-full flex items-center gap-1 text-xs">
                 <FaEye className="text-sm" />
                 <span>{Views || 0}</span>
               </div>
 
-              {/* Image Container */}
               <div className="relative h-48 sm:h-56 w-full bg-gray-100 dark:bg-gray-700 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent group-hover:from-black/10 transition-all duration-300" />
                 <img
@@ -90,15 +146,12 @@ const SearchResults : React.FC<SearchResultsProps> = ({query}) => {
                 />
               </div>
 
-              {/* Content Container */}
               <div className="p-4 space-y-3">
-                {/* Title */}
                 <h3 className="text-md sm:text-lg font-semibold text-gray-800 dark:text-white 
                              line-clamp-2 group-hover:text-customBlue transition-colors duration-200">
                   {Title}
                 </h3>
 
-                {/* Rating and Views (mobile) */}
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-1 text-sm">
                     {[...Array(5)].map((_, index) => (
@@ -112,14 +165,12 @@ const SearchResults : React.FC<SearchResultsProps> = ({query}) => {
                       />
                     ))}
                   </div>
-                  {/* Views counter for mobile */}
                   <div className="sm:hidden flex items-center gap-1 text-gray-500 dark:text-gray-400 text-xs">
                     <FaEye className="text-sm" />
                     <span>{Views || 0}</span>
                   </div>
                 </div>
 
-                {/* Price and CTA */}
                 <div className="flex items-center justify-between">
                   <p className="text-xl font-bold text-customBlue dark:text-customBlue">
                     {Currency} {Price}$
@@ -135,10 +186,10 @@ const SearchResults : React.FC<SearchResultsProps> = ({query}) => {
               </div>
             </div>
           </SwiperSlide>
-        )) : ""}
+        ))}
       </Swiper>
     </div>
-  )
-}
+  );
+};
 
-export default SearchResults
+export default SearchResults;

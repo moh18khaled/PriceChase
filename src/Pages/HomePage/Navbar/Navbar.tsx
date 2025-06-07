@@ -1,22 +1,25 @@
 import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { IoIosSearch, IoIosLogOut } from "react-icons/io";
+import { IoIosSearch, IoIosLogOut, IoMdClose } from "react-icons/io";
 import { HiMenu, HiX } from "react-icons/hi";
 import { BsSun, BsMoon } from "react-icons/bs";
-import { upMenu } from './Menu';
+import { fetchCategories, upMenu } from './Menu';
 import { UserContext } from '../../../context/context';
 import apiBaseUrl from '../../../config/axiosConfig';
 import Cookies from "js-cookie";
 import Swal from "sweetalert2"
-import logo from "../../../assets/images/logo (3).png"
+import logo from "../../../assets/images/new_logo.png"
+import { FiImage } from "react-icons/fi";
+import { Tooltip } from 'react-tooltip';
 
 type SearchBarProps = {
   onDebouncedSearch: (query: string) => void;
   showCategories: boolean;
   setShowCategories: (show: boolean) => void;
+  onImageUpload: (file: File | null) => void;
 };
 
-const Navbar: React.FC<SearchBarProps> = ({ onDebouncedSearch, showCategories, setShowCategories }) => {
+const Navbar: React.FC<SearchBarProps> = ({ onDebouncedSearch, showCategories, setShowCategories, onImageUpload }) => {
   const user = useContext(UserContext);
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -28,6 +31,11 @@ const Navbar: React.FC<SearchBarProps> = ({ onDebouncedSearch, showCategories, s
     }
     return false;
   });
+  const [hoveredCategory, setHoveredCategory] = useState(false);
+  const [mobileCategoryOpen, setMobileCategoryOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [searchByImage, setSearchByImage] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
     const userEmail = Cookies.get("userEmail");
@@ -42,12 +50,14 @@ const Navbar: React.FC<SearchBarProps> = ({ onDebouncedSearch, showCategories, s
   };
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      onDebouncedSearch(inputSearch);
-    }, 500);
+    if (!searchByImage) {
+      const timeout = setTimeout(() => {
+        onDebouncedSearch(inputSearch);
+      }, 500);
 
-    return () => clearTimeout(timeout);
-  }, [inputSearch, onDebouncedSearch]);
+      return () => clearTimeout(timeout);
+    }
+  }, [inputSearch, onDebouncedSearch, searchByImage]);
 
   useEffect(() => {
     const checkLoginStatus = () => {
@@ -119,20 +129,49 @@ const Navbar: React.FC<SearchBarProps> = ({ onDebouncedSearch, showCategories, s
     setMenuOpen(false);
   };
 
-  const handleCategoriesClick = () => {
-    setShowCategories(!showCategories);
-    if (!showCategories) {
-      setTimeout(() => {
-        scrollToSection('categories');
-      }, 100);
+  const toggleMobileCategories = () => {
+    setMobileCategoryOpen(!mobileCategoryOpen);
+  };
+
+  useEffect(() => {
+    const getCategories = async () => {
+      const data = await fetchCategories();
+      setCategories(data);
+    };
+    getCategories();
+  }, []);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      onImageUpload(file);
+      setSearchByImage(true);
+      setInputSearch('');
+    }
+  };
+
+  const handleCancelImageSearch = () => {
+    setSearchByImage(false);
+    setImagePreview(null);
+    onImageUpload(null);
+    setInputSearch('');
+  };
+
+  const handleTextSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!searchByImage) {
+      setInputSearch(e.target.value);
     }
   };
 
   return (
     <nav className='sticky top-0 z-50 bg-white dark:bg-gray-900 dark:text-white'>
-      {/* Upper Navbar */}
       <div className='py-4 shadow-md'>
-        <div className='w-11/12 mx-auto flex items-center justify-between'>
+        <div className='w-10/12 mx-auto h-12 flex items-center justify-between'>
           {/* Logo */}
           <div className='flex items-center gap-4'>
             <Link to="/" className='flex items-center'>
@@ -150,8 +189,42 @@ const Navbar: React.FC<SearchBarProps> = ({ onDebouncedSearch, showCategories, s
             <ul className='flex items-center gap-8'>
               {upMenu.map(({link, name}, idx) => (
                 <li key={idx}>
-                  {name === 'Popular Products' ? (
-                    <button 
+                  {name === 'Categories' ? (
+                    <div 
+                      className="relative"
+                      onMouseEnter={() => setHoveredCategory(true)}
+                      onMouseLeave={() => setHoveredCategory(false)}
+                    >
+                      <button
+                        className={`text-lg font-semibold transition-colors duration-200 
+                                  ${hoveredCategory ? 'text-customBlue' : 'hover:text-customBlue'}`}
+                      >
+                        {name}
+                      </button>
+
+                      {/* Categories Dropdown */}
+                      <div className={`absolute left-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 
+                                    rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 
+                                    transition-all duration-300 transform origin-top-left
+                                    ${hoveredCategory ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
+                        <div className="py-2">
+                          {categories.map(({ _id, CategoryName }) => (
+                            <Link
+                              key={_id}
+                              to={`/categories/${_id}`}
+                              className="block px-4 py-3 text-gray-700 dark:text-gray-200 
+                                       hover:bg-blue-50 dark:hover:bg-blue-900/30 
+                                       hover:text-blue-600 dark:hover:text-blue-400
+                                       transition-all duration-200 first:rounded-t-xl last:rounded-b-xl"
+                            >
+                              {CategoryName}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ) : name === 'Popular Products' ? (
+                    <button
                       onClick={() => scrollToSection('popular-products')}
                       className='hover:text-customBlue transition-colors duration-200 font-semibold'
                     >
@@ -160,20 +233,11 @@ const Navbar: React.FC<SearchBarProps> = ({ onDebouncedSearch, showCategories, s
                   ) : name === 'Discount Section' ? (
                     <button
                       onClick={() => scrollToSection('discount-products')}
-                      className='text-lg font-semibold hover:text-customBlue transition-colors duration-200'
+                      className='hover:text-customBlue transition-colors duration-200 font-semibold'
                     >
                       {name}
                     </button>
-                  ) : name === 'Categories' ? (
-                    <button
-                      onClick={handleCategoriesClick}
-                      className={`text-lg font-semibold transition-colors duration-200 ${
-                        showCategories ? 'text-customBlue' : 'hover:text-customBlue'
-                      }`}
-                    >
-                      {name}
-                    </button>
-                  ) : (
+                  ) :  (
                     <Link 
                       className='hover:text-customBlue transition-colors duration-200 font-semibold' 
                       to={link}
@@ -188,18 +252,62 @@ const Navbar: React.FC<SearchBarProps> = ({ onDebouncedSearch, showCategories, s
 
           {/* Search and Actions Container */}
           <div className='flex items-center gap-4'>
-            {/* Search Input */}
-            <div className='relative hidden sm:block'>
-              <input
-                type="text"
-                value={inputSearch}
-                onChange={(e) => setInputSearch(e.target.value)}
-                placeholder='Search'
-                className='w-[200px] lg:w-[250px] transition-all duration-300 rounded-lg border 
-                         border-gray-300 px-4 py-2 focus:outline-none focus:border-customBlue 
-                         dark:bg-gray-800 dark:border-gray-700'
-              />
-              <IoIosSearch className='text-gray-500 text-xl absolute top-1/2 -translate-y-1/2 right-3' />
+            {/* Search Input and Image Upload */}
+            <div className='hidden sm:flex items-center gap-2'>
+              {/* Image Upload Button */}
+              <div className="relative">
+                {searchByImage ? (
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <img 
+                        src={imagePreview || ''} 
+                        alt="Search preview" 
+                        className="w-10 h-10 rounded-md object-cover border border-gray-300"
+                      />
+                      <button
+                        onClick={handleCancelImageSearch}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                      >
+                        <IoMdClose className="text-xs" />
+                      </button>
+                    </div>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">Image search active</span>
+                  </div>
+                ) : (
+                  <>
+                    <label 
+                      className="cursor-pointer p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors duration-200 flex items-center justify-center"
+                      data-tooltip-id="image-search-tooltip"
+                      data-tooltip-content="Search by image (upload or camera)"
+                    >
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                      <FiImage className="text-gray-600 dark:text-gray-300 text-xl" />
+                    </label>
+                    <Tooltip id="image-search-tooltip" />
+                  </>
+                )}
+              </div>
+              
+              {/* Search Input */}
+              <div className='relative'>
+                <input
+                  type="text"
+                  value={inputSearch}
+                  onChange={handleTextSearchChange}
+                  placeholder={searchByImage ? 'Image search active' : 'Search products'}
+                  className={`w-[180px] lg:w-[220px] transition-all duration-300 rounded-lg border 
+                           border-gray-300 px-4 py-2 focus:outline-none focus:border-customBlue 
+                           dark:bg-gray-800 dark:border-gray-700 ${searchByImage ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={searchByImage}
+                />
+                <IoIosSearch className='text-gray-500 text-xl absolute top-1/2 -translate-y-1/2 right-3' />
+              </div>
             </div>
 
             {/* Theme Toggle */}
@@ -306,18 +414,52 @@ const Navbar: React.FC<SearchBarProps> = ({ onDebouncedSearch, showCategories, s
                 <HiX />
               </button>
 
-              {/* Mobile Search */}
+              {/* Mobile Search and Image Upload */}
               <div className='relative mb-6 sm:hidden'>
-                <input
-                  type="text"
-                  value={inputSearch}
-                  onChange={(e) => setInputSearch(e.target.value)}
-                  placeholder='Search'
-                  className='w-full transition-all duration-300 rounded-lg border 
-                           border-gray-300 px-4 py-2 focus:outline-none focus:border-customBlue
-                           dark:bg-gray-800 dark:border-gray-700'
-                />
-                <IoIosSearch className='text-gray-500 text-xl absolute top-1/2 -translate-y-1/2 right-3' />
+                <div className="flex items-center gap-2 mb-3">
+                  {searchByImage ? (
+                    <div className="flex items-center gap-2 w-full">
+                      <div className="relative">
+                        <img 
+                          src={imagePreview || ''} 
+                          alt="Search preview" 
+                          className="w-10 h-10 rounded-md object-cover border border-gray-300"
+                        />
+                        <button
+                          onClick={handleCancelImageSearch}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                        >
+                          <IoMdClose className="text-xs" />
+                        </button>
+                      </div>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">Image search active</span>
+                    </div>
+                  ) : (
+                    <label className="cursor-pointer p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors duration-200 flex items-center justify-center">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                      <FiImage className="text-gray-600 dark:text-gray-300 text-xl" />
+                    </label>
+                  )}
+                </div>
+                <div className="relative w-full">
+                  <input
+                    type="text"
+                    value={inputSearch}
+                    onChange={handleTextSearchChange}
+                    placeholder={searchByImage ? 'Image search active' : 'Search products'}
+                    className={`w-full transition-all duration-300 rounded-lg border 
+                             border-gray-300 pl-4 pr-10 py-2 focus:outline-none focus:border-customBlue
+                             dark:bg-gray-800 dark:border-gray-700 ${searchByImage ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    disabled={searchByImage}
+                  />
+                  <IoIosSearch className="text-gray-500 text-xl absolute top-1/2 -translate-y-1/2 right-3" />
+                </div>
               </div>
 
               {/* Mobile Navigation Links */}
@@ -345,17 +487,40 @@ const Navbar: React.FC<SearchBarProps> = ({ onDebouncedSearch, showCategories, s
                         {name}
                       </button>
                     ) : name === 'Categories' ? (
-                      <button
-                        onClick={() => {
-                          handleCategoriesClick();
-                          setMenuOpen(false);
-                        }}
-                        className={`text-lg font-semibold transition-colors duration-200 w-full text-left ${
-                          showCategories ? 'text-customBlue' : 'hover:text-customBlue'
-                        }`}
-                      >
-                        {name}
-                      </button>
+                      <div className="relative">
+                        <button
+                          onClick={toggleMobileCategories}
+                          className={`text-lg font-semibold transition-colors duration-200 w-full text-left flex items-center justify-between ${
+                            mobileCategoryOpen ? 'text-customBlue' : 'hover:text-customBlue'
+                          }`}
+                        >
+                          {name}
+                          <span className="transform transition-transform duration-200">
+                            {mobileCategoryOpen ? '−' : '+'}
+                          </span>
+                        </button>
+
+                        {/* Mobile Categories Dropdown */}
+                        <div className={`overflow-hidden transition-all duration-300 ${
+                          mobileCategoryOpen ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'
+                        }`}>
+                          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
+                            {categories.map(({ _id, CategoryName }) => (
+                              <Link
+                                key={_id}
+                                to={`/categories/${_id}`}
+                                onClick={() => setMenuOpen(false)}
+                                className="block px-4 py-2 text-gray-700 dark:text-gray-200 
+                                         hover:bg-blue-50 dark:hover:bg-blue-900/30 
+                                         hover:text-blue-600 dark:hover:text-blue-400
+                                         transition-all duration-200 rounded-lg"
+                              >
+                                {CategoryName}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
                     ) : (
                       <Link 
                         to={link}

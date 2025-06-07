@@ -5,23 +5,31 @@ import PopularProducts from "./PopularProducts/PopularProducts"
 import Footer from "./Footer/Footer"
 import DownNavbar from "./Navbar/DownNavbar"
 import SearchResults from "./Search/SearchResults"
+import SearchByImageResults from "./Search/SearchByImageResults"
 import { useState } from "react"
 
 const HomePage = () => {
   const [showCategories, setShowCategories] = useState(false);
   const [query, setQuery] = useState('');
+  const [imageQuery, setImageQuery] = useState<File | null>(null);
+
   return (
     <div className="dark:bg-gray-900 dark:text-white">
-      <Navbar onDebouncedSearch={setQuery}
-      showCategories={showCategories}
-      setShowCategories={setShowCategories}
+      <Navbar 
+        onDebouncedSearch={setQuery}
+        showCategories={showCategories}
+        setShowCategories={setShowCategories}
+        onImageUpload={setImageQuery}
       />
-      <DownNavbar visible={showCategories} 
-      onClose={() => setShowCategories(false)} />
-      {query.trim() !== `` && <SearchResults query={query} />}
-      <Hero />
-      <PopularProducts />
-      <DicountSection />
+      {query.trim() !== '' && <SearchResults query={query} />}
+      {imageQuery && <SearchByImageResults imageQuery={imageQuery} />}
+      
+        
+          <Hero />
+          <PopularProducts />
+          <DicountSection />
+        
+      
       <Footer />
     </div>
   )
